@@ -21,7 +21,6 @@ için kontrol listesi. Puanlama 100 üzerinden.
 
 ## Teknik zorunluluklar
 - [ ] Web: Next.js — Vercel deploy
-- [ ] Mobil: Expo
 - [ ] Backend: Go + masterfabric-go mimarisi (birebir)
 - [ ] AI: Hugging Face model/dataset
 - [ ] Google Street View API (≤ 10.000 istek)

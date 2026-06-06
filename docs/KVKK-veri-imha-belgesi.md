@@ -10,20 +10,25 @@
 - **Tarih:** 6 Haziran 2026
 
 ## 2. İşlenen Verinin Kapsamı
-- **Veri kaynağı:** Google Street View API / sağlanan veri seti
-- **Amaç:** Yalnızca cansız kentsel obje tespiti (tabela, çöp kutusu, hasarlı yol vb.)
+- **Veri kaynağı:** Vatandaşın çektiği/yüklediği fotoğraf, Google Street View API veya sağlanan veri seti
+- **Amaç:** Yalnızca cansız kentsel ihlal tespiti ve hukuki başvuru taslağı üretimi (kaldırım işgali, yol çukuru, kırık tabela, çöp birikimi vb.)
 - **İşlenmeyen veriler:** Yüz tanıma, plaka okuma, kişi/araç takibi, profilleme YAPILMAMIŞTIR.
 
 ## 3. Anonimleştirme
 - [ ] İnsan yüzleri model çalışmadan önce geri döndürülemez şekilde bulanıklaştırıldı.
 - [ ] Araç plakaları geri döndürülemez şekilde bulanıklaştırıldı.
-- **Kullanılan yöntem:** _______________ (ör. Gaussian blur + downsample)
-- **Anonimleştirme kodu:** `___________` (repo içi dosya yolu)
+- **Kullanılan yöntem:** Cihaz tarafında düşük çözünürlüğe indirme + blur/downsample. Demo arayüzünde ham görsel backend'e gönderilmeden önce anonimleştirilmiş önizleme oluşturulur.
+- **Anonimleştirme kodu:** `web/src/app/page.tsx` (demo önizleme akışı)
 
 ## 4. Veri Güvenliği
 - [ ] Ham veriler açık repoya / şifrelenmemiş buluta yüklenmedi.
 - [ ] API anahtarları yalnızca `.env` içinde tutuldu, commit edilmedi.
-- **Depolama konumu:** _______________ (lokal / geçici)
+- **Depolama konumu:** Lokal/geçici tarayıcı belleği; backend demo akışında ham görüntü saklanmaz.
+
+## 4.1. Hukuki Metin Güvenliği
+- Üretilen dilekçe metni “taslak başvuru” olarak sunulur; kesin hukuki danışmanlık iddiası taşımaz.
+- Mevzuat eşleşmeleri küçük ve kontrollü RAG korpusundan yapılır: `docs/legal/cimer-plus-corpus.json`.
+- Kimlik tespiti, kişi takibi veya plaka/yüz verisi saklama yapılmaz.
 
 ## 5. İmha (Hackathon Sonu)
 - [ ] Tüm ham görüntüler kalıcı olarak silindi.

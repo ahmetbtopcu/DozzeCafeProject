@@ -1,0 +1,86 @@
+{
+  "version": "2026-06-06-demo",
+  "disclaimer": "Bu korpus hackathon demosu icin sadeleştirilmiş mevzuat ozeti icerir. Resmi hukuki danismanlik degildir.",
+  "violations": [
+    {
+      "id": "kaldirim_isgali",
+      "label": "Kaldirim isgali",
+      "severityHint": "Yaya gecisini daraltiyor veya engelliyorsa yuksek oncelik verilir.",
+      "authority": "Ilce belediyesi zabita mudurlugu / ALO 153",
+      "legalBasis": [
+        {
+          "title": "5393 sayili Belediye Kanunu",
+          "article": "Madde 15",
+          "summary": "Belediye, belde sakinlerinin mahalli musterek nitelikteki ihtiyaclarini karsilamak ve kent duzenini saglamakla gorevlidir."
+        },
+        {
+          "title": "5326 sayili Kabahatler Kanunu",
+          "article": "Madde 38",
+          "summary": "Yetkili makamlarin aldigi kararlara aykiri sekilde ortak kullanim alanini isgal edenler hakkinda idari yaptirim uygulanabilir."
+        }
+      ],
+      "petitionDemand": "Kaldirim isgalinin giderilmesi, yaya guvenliginin saglanmasi ve gerekli idari islemin baslatilmasi"
+    },
+    {
+      "id": "yol_cukuru",
+      "label": "Yol cukuru veya zemin bozuklugu",
+      "severityHint": "Trafik veya yaya guvenligi riski olusturuyorsa yuksek oncelik verilir.",
+      "authority": "Ilce belediyesi fen isleri mudurlugu / ALO 153",
+      "legalBasis": [
+        {
+          "title": "5393 sayili Belediye Kanunu",
+          "article": "Madde 14",
+          "summary": "Belediye, yol, su, kanalizasyon ve ulasim gibi kentsel altyapi hizmetlerini yapmak veya yaptirmakla gorevlidir."
+        }
+      ],
+      "petitionDemand": "Yol bozuklugunun yerinde incelenmesi, guvenlik tedbiri alinmasi ve onarimin yapilmasi"
+    },
+    {
+      "id": "kirik_tabela",
+      "label": "Kirik veya tehlikeli tabela",
+      "severityHint": "Dusme, kesici parca veya yonlendirme hatasi riski varsa yuksek oncelik verilir.",
+      "authority": "Ilce belediyesi zabita mudurlugu / ilgili yol bakim birimi",
+      "legalBasis": [
+        {
+          "title": "5393 sayili Belediye Kanunu",
+          "article": "Madde 15",
+          "summary": "Belediye, belde duzeni ve esenligi icin gerekli tedbirleri alma yetkisine sahiptir."
+        }
+      ],
+      "petitionDemand": "Tabelanin guvenli hale getirilmesi, gerekiyorsa kaldirilmasi veya yenilenmesi"
+    },
+    {
+      "id": "cop_birikimi",
+      "label": "Cop birikimi",
+      "severityHint": "Koku, hasere veya yaya gecisini engelleme varsa orta/yuksek oncelik verilir.",
+      "authority": "Ilce belediyesi temizlik isleri mudurlugu / ALO 153",
+      "legalBasis": [
+        {
+          "title": "5393 sayili Belediye Kanunu",
+          "article": "Madde 14",
+          "summary": "Belediye, cevre sagligi, temizlik ve kati atik hizmetlerini yurutmekle gorevlidir."
+        }
+      ],
+      "petitionDemand": "Cop birikiminin kaldirilmasi, bolgenin temizlenmesi ve tekrarini onleyici denetim yapilmasi"
+    },
+    {
+      "id": "engelli_rampasi_engeli",
+      "label": "Engelli rampasi engeli",
+      "severityHint": "Erisilebilirlik tamamen engelleniyorsa acil/yuksek oncelik verilir.",
+      "authority": "Ilce belediyesi zabita mudurlugu / ALO 153",
+      "legalBasis": [
+        {
+          "title": "5378 sayili Engelliler Hakkinda Kanun",
+          "article": "Erisilebilirlik ilkesi",
+          "summary": "Kamuya acik alanlarda engellilerin erisimini kolaylastiracak duzenlemelerin korunmasi esastir."
+        },
+        {
+          "title": "5393 sayili Belediye Kanunu",
+          "article": "Madde 14",
+          "summary": "Belediye hizmetleri vatandaslarin ihtiyaclarina uygun ve erisilebilir sekilde sunulur."
+        }
+      ],
+      "petitionDemand": "Rampayi engelleyen unsurun kaldirilmasi ve erisilebilirligin yeniden saglanmasi"
+    }
+  ]
+}
