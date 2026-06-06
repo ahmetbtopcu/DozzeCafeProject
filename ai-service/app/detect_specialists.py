@@ -1,4 +1,13 @@
-"""Hackathon sonrası — görev bazlı uzman modeller (ENABLE_SPECIALIST_MODELS=true)."""
+"""Görev bazlı uzman modeller.
+
+- road: RDD2022 YOLOv8 (ozair23) — çukur + çatlak (road_damage). HF'den indirilir.
+- garbage: fine-tune edilmiş yerel model (garbage_finetuned.pt). Yoksa çalışmaz.
+CLIP yönlendiricisi sahneyi belirledikten sonra yalnızca ilgili model çalışır.
+
+Not: Hazır atık-ayrıştırma modelleri (cam/kağıt/plastik) sokak çöp yığını için
+güvenilmez (çukuru çöp sanıyor), bu yüzden çöp fine-tune'a bırakıldı.
+Bkz. scripts/finetune/README.md
+"""
 from __future__ import annotations
 
 import io
@@ -7,33 +16,50 @@ from typing import Any
 
 from PIL import Image
 
-from app.config import ENABLE_SPECIALIST_MODELS, VIOLATION_CLASSES, YOLO_CONF, YOLO_IMGSZ
+from app.config import (
+    ENABLE_GARBAGE_SPECIALIST,
+    ENABLE_SPECIALIST_MODELS,
+    GARBAGE_MODEL,
+    ROAD_DAMAGE_MODEL,
+    VIOLATION_CLASSES,
+    YOLO_CONF,
+    YOLO_IMGSZ,
+)
 
 logger = logging.getLogger(__name__)
 
 _specialists: dict[str, Any] = {}
 
-# Hugging Face model ID'leri — Standard tier'da indirilir
-SPECIALIST_MODELS = {
-    "pothole": "keremberke/yolov8s-pothole-segmentation",
-    "litter": "Alope/trash-detection-yolo11n",
+# task -> (huggingface_repo_id | None, yerel ağırlık yolu, flag)
+# repo_id None ise model yalnızca yerel dosyadan yüklenir (fine-tune sonrası).
+SPECIALIST_SPECS = {
+    "road": ("ozair23/yolov8-road-damage-detector", ROAD_DAMAGE_MODEL, ENABLE_SPECIALIST_MODELS),
+    "garbage": (None, GARBAGE_MODEL, ENABLE_GARBAGE_SPECIALIST),
 }
 
 
 def _load_specialist(task: str):
-    if not ENABLE_SPECIALIST_MODELS:
+    spec = SPECIALIST_SPECS.get(task)
+    if not spec:
+        return None
+    repo_id, local_path, enabled = spec
+    if not enabled:
         return None
     if task in _specialists:
         return _specialists[task]
-    model_id = SPECIALIST_MODELS.get(task)
-    if not model_id:
-        return None
     try:
-        from huggingface_hub import hf_hub_download
         from ultralytics import YOLO
 
-        path = hf_hub_download(repo_id=model_id, filename="best.pt")
-        model = YOLO(path)
+        if local_path.is_file():
+            model = YOLO(str(local_path))
+        elif repo_id:
+            from huggingface_hub import hf_hub_download
+
+            path = hf_hub_download(repo_id=repo_id, filename="best.pt")
+            model = YOLO(path)
+        else:
+            logger.warning("specialist %s: ağırlık yok (%s) — fine-tune gerekli", task, local_path)
+            return None
         _specialists[task] = model
         return model
     except Exception as exc:
@@ -42,14 +68,14 @@ def _load_specialist(task: str):
 
 
 def detect_pothole(image_bytes: bytes) -> list[dict[str, Any]]:
-    model = _load_specialist("pothole")
+    model = _load_specialist("road")
     if model is None:
         return []
     return _run_yolo(model, image_bytes, "road_damage")
 
 
 def detect_litter(image_bytes: bytes) -> list[dict[str, Any]]:
-    model = _load_specialist("litter")
+    model = _load_specialist("garbage")
     if model is None:
         return []
     return _run_yolo(model, image_bytes, "garbage_pile")

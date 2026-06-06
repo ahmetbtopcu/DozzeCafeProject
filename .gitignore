@@ -30,11 +30,16 @@ vendor/
 gcp-key.json
 service-account*.json
 
-# ONNX ağırlıkları (Docker build'de indirilir)
+# Model ağırlıkları (scripts/download-models.ps1 ile indirilir, commit edilmez)
 ai-service/models/*.onnx
+ai-service/models/*.pt
+ai-service/.venv/
 
 # HAM VERİ — KVKK gereği ham görüntüler asla repoya yüklenmez
 data/raw/
+data/test/**/*.jpg
+data/test/**/*.jpeg
+data/test/**/*.png
 **/raw_images/
 *.raw
 

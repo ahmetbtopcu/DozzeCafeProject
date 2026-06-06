@@ -35,17 +35,6 @@
       "petition_snippet": "Sokakta moloz yığını bulunmaktadır; çevre kirliliği ve sağlık riski oluşturmaktadır."
     },
     {
-      "id": "demo-004",
-      "violation_type": "broken_sign",
-      "violation_label": "Kırık / devrik tabela",
-      "lat": 41.0925,
-      "lng": 28.8010,
-      "severity": { "score": 48, "level": "medium", "primary_type": "broken_sign", "primary_label": "Kırık / devrik tabela" },
-      "detections": [{ "type": "broken_sign", "label": "Kırık / devrik tabela", "confidence": 0.71, "bbox": [0.4, 0.2, 0.65, 0.5] }],
-      "authority": { "authority": "İBB Ulaşım Dairesi / KGM", "channel": "CİMER / Alo 159", "law_ref": "2918 Karayolları Trafik Kanunu" },
-      "petition_snippet": "Trafik yön tabelası devrilmiş durumda; sürücülerin yön bulması engellenmektedir."
-    },
-    {
       "id": "demo-005",
       "violation_type": "sidewalk_occupation",
       "violation_label": "Kaldırım işgali (masa)",

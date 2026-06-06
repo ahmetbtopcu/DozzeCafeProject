@@ -14,11 +14,6 @@ AUTHORITY_RULES: dict[str, dict[str, str]] = {
         "channel": "CİMER / 153",
         "law_ref": "5216 sayılı Büyükşehir Kanunu — görev dağılımı",
     },
-    "broken_sign": {
-        "authority": "İBB Ulaşım Dairesi / KGM",
-        "channel": "CİMER / Alo 159",
-        "law_ref": "2918 sayılı Karayolları Trafik Kanunu",
-    },
     "garbage_pile": {
         "authority": "İlçe Belediyesi Temizlik İşleri",
         "channel": "CİMER / 153",

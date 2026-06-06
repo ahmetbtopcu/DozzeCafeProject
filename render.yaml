@@ -4,15 +4,19 @@ services:
     name: nobetci-ai-service
     runtime: docker
     region: frankfurt
-    plan: free
+    # Üç YOLO modeli + torch ~1.5-2GB RAM ister; free tier (512MB) OOM olur.
+    # Gerçek inference için Standard (2GB) önerilir.
+    plan: standard
     dockerfilePath: ./ai-service/Dockerfile
     dockerContext: .
     healthCheckPath: /health
     envVars:
       - key: DEMO_MODE
-        value: "true"
-      - key: ENABLE_SPECIALIST_MODELS
         value: "false"
+      - key: ENABLE_SPECIALIST_MODELS
+        value: "true"
+      - key: DETECT_TIMEOUT_SEC
+        value: "30"
       - key: OPENAI_API_KEY
         sync: false
 
@@ -33,5 +37,7 @@ services:
           name: nobetci-ai-service
           type: web
           property: hostport
+      # Gerçek AI sonuçları kullanılır. AI servis hata verirse demo rapora
+      # düşmek isterseniz "true" yapın (graceful fallback).
       - key: DEMO_MODE
-        value: "true"
+        value: "false"

@@ -55,7 +55,8 @@ async def detect_endpoint(file: UploadFile = File(...)) -> DetectResponse:
     anon, _ = anonymize.anonymize_image_bytes(data)
     dets = detect.detect_violations(anon)
     used_demo = False
-    if not dets:
+    # Cache fallback yalnızca demo modunda; gerçek modda boş sonuç gerçek sonuçtur.
+    if not dets and DEMO_MODE:
         dets, _ = demo.demo_detections_from_cache()
         used_demo = True
     return DetectResponse(detections=dets, demo=used_demo)
@@ -126,7 +127,8 @@ async def pipeline_endpoint(file: UploadFile = File(...)) -> PipelineResponse:
         )
 
     dets = detect.detect_violations(anon)
-    if not dets:
+    if not dets and DEMO_MODE:
+        # Yalnızca demo modunda cache fallback; gerçek modda boş = ihlal yok.
         dets, sev = demo.demo_detections_from_cache()
         used_demo = True
     else:
