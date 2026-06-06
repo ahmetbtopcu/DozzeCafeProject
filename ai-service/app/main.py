@@ -8,7 +8,8 @@ from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app import anonymize, detect, severity
+from app import anonymize, detect, petition, rag, severity
+from app.authority import route_authority
 from app.config import DEMO_MODE
 
 app = FastAPI(title="Nobetci AI Service", version="0.1.0")
@@ -86,4 +87,46 @@ async def pipeline_endpoint(file: UploadFile = File(...)) -> PipelineResponse:
         blur_count=blur_count,
         detections=dets,
         severity=sev,
+    )
+
+
+class RagRequest(BaseModel):
+    query: str
+    top_k: int = 3
+
+
+@app.post("/rag/retrieve")
+async def rag_retrieve(body: RagRequest) -> dict[str, Any]:
+    results = rag.retrieve(body.query, top_k=body.top_k)
+    return {"results": results}
+
+
+class AuthorityRequest(BaseModel):
+    violation_type: str
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+    is_main_artery: Optional[bool] = None
+
+
+@app.post("/authority")
+async def authority_endpoint(body: AuthorityRequest) -> dict[str, Any]:
+    return route_authority(body.violation_type, body.lat, body.lng, body.is_main_artery)
+
+
+class PetitionRequest(BaseModel):
+    violation_type: str
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+    severity: Optional[dict[str, Any]] = None
+    is_main_artery: Optional[bool] = None
+
+
+@app.post("/petition")
+async def petition_endpoint(body: PetitionRequest) -> dict[str, Any]:
+    return await petition.generate_petition(
+        body.violation_type,
+        body.lat,
+        body.lng,
+        body.severity,
+        body.is_main_artery,
     )
