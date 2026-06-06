@@ -10,6 +10,7 @@ import (
 
 	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/client"
 	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/handler"
+	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/seed"
 	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/store"
 )
 
@@ -38,6 +39,15 @@ func main() {
 	st := store.NewMemoryStore()
 	reports := handler.NewReportHandler(ai, st)
 	admin := handler.NewAdminHandler(st)
+
+	if len(st.List()) == 0 {
+		if mockReport, err := seed.BuildMockReport(); err != nil {
+			log.Printf("Mock ihbar yüklenemedi: %v", err)
+		} else {
+			st.Add(mockReport)
+			log.Printf("Mock ihbar eklendi (id=%s) — admin paneli önizlemesi", mockReport.ID)
+		}
+	}
 
 	mux := http.NewServeMux()
 
@@ -69,6 +79,7 @@ func main() {
 	mux.HandleFunc("GET /api/admin/reports", admin.List)
 	mux.HandleFunc("GET /api/admin/reports/{id}", admin.Get)
 	mux.HandleFunc("PATCH /api/admin/reports/{id}", admin.UpdateStatus)
+	mux.HandleFunc("POST /api/admin/seed-mock", admin.SeedMock)
 
 	port := os.Getenv("PORT")
 	if port == "" {

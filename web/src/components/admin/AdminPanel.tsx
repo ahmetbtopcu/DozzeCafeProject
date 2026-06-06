@@ -8,12 +8,13 @@ import {
   fetchAdminReports,
   formatAddress,
   formatReporter,
+  seedMockReport,
   updateAdminReportStatus,
+  violationLabel,
   type AdminReport,
   type AdminReportSummary,
   type ReportStatus,
 } from "@/lib/admin";
-import { clearAdminKey, storeAdminKey, useStoredAdminKey } from "@/lib/admin-session";
 
 const STATUS_OPTIONS: ReportStatus[] = ["pending", "in_review", "forwarded", "closed"];
 
@@ -32,9 +33,6 @@ function normalizeStatus(status?: string): ReportStatus {
 }
 
 export default function AdminPanel() {
-  const storedAdminKey = useStoredAdminKey();
-  const [adminKey, setAdminKey] = useState("");
-  const [inputKey, setInputKey] = useState("");
   const [reports, setReports] = useState<AdminReportSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedReport, setSelectedReport] = useState<AdminReport | null>(null);
@@ -45,42 +43,27 @@ export default function AdminPanel() {
   const [nextStatus, setNextStatus] = useState<ReportStatus>("in_review");
   const [adminNote, setAdminNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setAdminKey(storedAdminKey);
-    }, 0);
-    return () => window.clearTimeout(timeout);
-  }, [storedAdminKey]);
-
-  const loadReports = useCallback(async (key: string) => {
+  const loadReports = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchAdminReports(key);
+      const data = await fetchAdminReports();
       setReports(data.sort((a, b) => b.created_at.localeCompare(a.created_at)));
     } catch (err) {
-      if (err instanceof Error && err.message === "UNAUTHORIZED") {
-        clearAdminKey();
-        setAdminKey("");
-        setError("Geçersiz admin anahtarı.");
-      } else {
-        setError(err instanceof Error ? err.message : "Liste yüklenemedi.");
-      }
+      setError(err instanceof Error ? err.message : "Liste yüklenemedi.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (!adminKey) {
-      return;
-    }
     const timeout = window.setTimeout(() => {
-      void loadReports(adminKey);
+      void loadReports();
     }, 0);
     return () => window.clearTimeout(timeout);
-  }, [adminKey, loadReports]);
+  }, [loadReports]);
 
   const filteredReports = useMemo(() => {
     if (statusFilter === "all") {
@@ -89,35 +72,12 @@ export default function AdminPanel() {
     return reports.filter((report) => normalizeStatus(report.status) === statusFilter);
   }, [reports, statusFilter]);
 
-  async function handleLogin(event: React.FormEvent) {
-    event.preventDefault();
-    const key = inputKey.trim();
-    if (!key) {
-      return;
-    }
-    storeAdminKey(key);
-    setAdminKey(key);
-    setInputKey("");
-    void loadReports(key);
-  }
-
-  function handleLogout() {
-    clearAdminKey();
-    setAdminKey("");
-    setReports([]);
-    setSelectedId(null);
-    setSelectedReport(null);
-  }
-
   async function openReport(id: string) {
-    if (!adminKey) {
-      return;
-    }
     setSelectedId(id);
     setDetailLoading(true);
     setError(null);
     try {
-      const report = await fetchAdminReport(adminKey, id);
+      const report = await fetchAdminReport(id);
       setSelectedReport(report);
       setNextStatus(normalizeStatus(report.status));
       setAdminNote(report.admin_note ?? "");
@@ -130,14 +90,31 @@ export default function AdminPanel() {
     }
   }
 
+  async function handleSeedMock() {
+    setSeeding(true);
+    setError(null);
+    try {
+      const report = await seedMockReport();
+      await loadReports();
+      setSelectedId(report.id);
+      setSelectedReport(report);
+      setNextStatus(normalizeStatus(report.status));
+      setAdminNote(report.admin_note ?? "");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Mock ihbar eklenemedi.");
+    } finally {
+      setSeeding(false);
+    }
+  }
+
   async function handleStatusSave() {
-    if (!adminKey || !selectedReport) {
+    if (!selectedReport) {
       return;
     }
     setSaving(true);
     setError(null);
     try {
-      const updated = await updateAdminReportStatus(adminKey, selectedReport.id, nextStatus, adminNote);
+      const updated = await updateAdminReportStatus(selectedReport.id, nextStatus, adminNote);
       setSelectedReport(updated);
       setReports((current) =>
         current.map((item) =>
@@ -156,62 +133,29 @@ export default function AdminPanel() {
     }
   }
 
-  if (!adminKey) {
-    return (
-      <div className="flex min-h-screen items-center justify-center px-6 py-12">
-        <form
-          onSubmit={handleLogin}
-          className="w-full max-w-md rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-black/30 backdrop-blur"
-        >
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-300">Nöbetçi Admin</p>
-          <h1 className="mt-3 text-3xl font-semibold text-white">İhbar yönetim paneli</h1>
-          <p className="mt-3 text-sm leading-6 text-zinc-300">
-            Bu sayfa yalnızca yetkili personel içindir. Giriş için admin API anahtarını girin.
-          </p>
-          <label className="mt-6 block">
-            <span className="mb-2 block text-sm font-medium text-zinc-200">Admin API anahtarı</span>
-            <input
-              type="password"
-              value={inputKey}
-              onChange={(event) => setInputKey(event.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-zinc-900/80 px-4 py-3 text-sm text-white outline-none transition duration-200 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/20"
-              placeholder="ADMIN_API_KEY"
-            />
-          </label>
-          {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
-          <button
-            type="submit"
-            className="mt-6 w-full rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-zinc-950 transition duration-200 hover:bg-emerald-400"
-          >
-            Panele gir
-          </button>
-        </form>
-      </div>
-    );
-  }
-
   return (
     <>
       <header className="border-b border-white/10 bg-black/20 px-6 py-5 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-300">Ayrı admin alanı</p>
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-300">Prototip admin</p>
             <h1 className="text-2xl font-semibold text-white">Gelen ihbarlar</h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={() => void loadReports(adminKey)}
-              className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-100 transition duration-200 hover:bg-white/10"
+              onClick={() => void handleSeedMock()}
+              disabled={seeding}
+              className="rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-sm font-medium text-amber-100 transition duration-200 hover:bg-amber-400/20 disabled:opacity-60"
             >
-              Yenile
+              {seeding ? "Mock ekleniyor…" : "Mock ihbar ekle"}
             </button>
             <button
               type="button"
-              onClick={handleLogout}
-              className="rounded-full bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition duration-200 hover:bg-zinc-200"
+              onClick={() => void loadReports()}
+              className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-100 transition duration-200 hover:bg-white/10"
             >
-              Çıkış
+              Yenile
             </button>
           </div>
         </div>
@@ -303,19 +247,47 @@ export default function AdminPanel() {
                 </span>
               </div>
 
-              <DetailBlock title="Adres" value={formatAddress(selectedReport.address)} />
-              <DetailBlock title="İhbarcı" value={formatReporter(selectedReport.reporter)} />
-              {selectedReport.details && <DetailBlock title="Ayrıntı" value={selectedReport.details} />}
+              <FieldGroup title="Formdan gelen ihlal bilgisi">
+                <Field label="Kullanıcının seçtiği ihlal" value={violationLabel(selectedReport.user_violation_type)} />
+                <Field label="AI tespit etiketi" value={selectedReport.violation_label} />
+                <Field label="AI ihlal kodu" value={selectedReport.violation_type} />
+                <Field label="Ayrıntılı bilgi" value={selectedReport.details || "—"} multiline />
+              </FieldGroup>
+
+              <FieldGroup title="Adres bilgileri">
+                <Field label="İl" value={selectedReport.address?.city || "—"} />
+                <Field label="İlçe" value={selectedReport.address?.district || "—"} />
+                <Field label="Mahalle" value={selectedReport.address?.neighborhood || "—"} />
+                <Field label="Cadde" value={selectedReport.address?.avenue || "—"} />
+                <Field label="Sokak" value={selectedReport.address?.street || "—"} />
+                <Field label="Kapı no" value={selectedReport.address?.building_no || "—"} />
+                <Field label="Tam adres" value={formatAddress(selectedReport.address)} multiline />
+                <Field label="Koordinat" value={`${selectedReport.lat}, ${selectedReport.lng}`} />
+              </FieldGroup>
+
+              <FieldGroup title="İhbarı yapan kişi">
+                <Field label="İsim" value={selectedReport.reporter?.first_name || "—"} />
+                <Field label="Soyisim" value={selectedReport.reporter?.last_name || "—"} />
+                <Field label="Ad soyad" value={selectedReport.reporter?.name || "—"} />
+                <Field label="E-posta" value={selectedReport.reporter?.email || "—"} />
+                <Field label="Telefon" value={selectedReport.reporter?.phone || "—"} />
+              </FieldGroup>
 
               {selectedReport.image_base64 && (
-                <Image
-                  src={`data:image/jpeg;base64,${selectedReport.image_base64}`}
-                  alt="Anonimleştirilmiş kanıt"
-                  width={720}
-                  height={360}
-                  unoptimized
-                  className="max-h-56 w-full rounded-3xl object-cover"
-                />
+                <div>
+                  <p className="mb-2 text-sm font-medium text-white">Yüklenen fotoğraf (mock kanıt)</p>
+                  <Image
+                    src={`data:image/jpeg;base64,${selectedReport.image_base64}`}
+                    alt="İhbar fotoğrafı"
+                    width={960}
+                    height={540}
+                    unoptimized
+                    className="max-h-80 w-full rounded-3xl object-cover"
+                  />
+                  <p className="mt-2 text-xs text-zinc-500">
+                    Mock örnek: Lionel Messi 2010 (Wikimedia). Gerçek ihbarlarda yüz/plaka model öncesi bulanıklaştırılır.
+                  </p>
+                </div>
               )}
 
               <div className="rounded-2xl border border-white/10 bg-emerald-500/10 p-4 text-sm">
@@ -375,11 +347,20 @@ export default function AdminPanel() {
   );
 }
 
-function DetailBlock({ title, value }: { title: string; value: string }) {
+function FieldGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-white/10 px-4 py-3 text-sm">
-      <p className="font-medium text-white">{title}</p>
-      <p className="mt-1 leading-6 text-zinc-300">{value}</p>
+    <div className="rounded-2xl border border-white/10 p-4">
+      <p className="mb-3 text-sm font-semibold text-emerald-200">{title}</p>
+      <div className="grid gap-3 sm:grid-cols-2">{children}</div>
+    </div>
+  );
+}
+
+function Field({ label, value, multiline = false }: { label: string; value: string; multiline?: boolean }) {
+  return (
+    <div className={multiline ? "sm:col-span-2" : ""}>
+      <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p>
+      <p className={`mt-1 text-sm text-zinc-200 ${multiline ? "leading-6" : ""}`}>{value}</p>
     </div>
   );
 }

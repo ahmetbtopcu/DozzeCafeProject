@@ -59,67 +59,57 @@ export const REPORT_STATUS_LABELS: Record<ReportStatus, string> = {
   closed: "Kapatıldı",
 };
 
-function adminHeaders(adminKey: string) {
-  return {
-    "X-Admin-Key": adminKey,
-    "Content-Type": "application/json",
-  };
+export const USER_VIOLATION_LABELS: Record<string, string> = {
+  sidewalk_occupation: "Kaldırım ihlali",
+  crosswalk_violation: "Yaya geçidi ihlali",
+  road_damage: "Yol çukuru",
+  broken_sign: "Kırık tabela",
+  garbage_pile: "Çöp / moloz",
+  ramp_blocked: "Engelli rampası engeli",
+  other: "Diğer",
+};
+
+export function violationLabel(code?: string) {
+  if (!code) {
+    return "—";
+  }
+  return USER_VIOLATION_LABELS[code] ?? code;
 }
 
-export async function fetchAdminReports(adminKey: string): Promise<AdminReportSummary[]> {
-  const res = await fetch("/api/admin/reports", {
-    headers: adminHeaders(adminKey),
-    cache: "no-store",
-  });
-  if (res.status === 401) {
-    throw new Error("UNAUTHORIZED");
-  }
-  if (res.status === 503) {
-    const payload = (await res.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(payload?.error ?? "Admin yapılandırması eksik.");
-  }
+export async function fetchAdminReports(): Promise<AdminReportSummary[]> {
+  const res = await fetch("/api/admin/reports", { cache: "no-store" });
   if (!res.ok) {
     throw new Error("İhbar listesi alınamadı.");
   }
   return res.json();
 }
 
-export async function fetchAdminReport(adminKey: string, id: string): Promise<AdminReport> {
-  const res = await fetch(`/api/admin/reports/${id}`, {
-    headers: adminHeaders(adminKey),
-    cache: "no-store",
-  });
-  if (res.status === 401) {
-    throw new Error("UNAUTHORIZED");
-  }
-  if (res.status === 503) {
-    const payload = (await res.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(payload?.error ?? "Admin yapılandırması eksik.");
-  }
+export async function fetchAdminReport(id: string): Promise<AdminReport> {
+  const res = await fetch(`/api/admin/reports/${id}`, { cache: "no-store" });
   if (!res.ok) {
     throw new Error("İhbar detayı alınamadı.");
   }
   return res.json();
 }
 
+export async function seedMockReport(): Promise<AdminReport> {
+  const res = await fetch("/api/admin/seed-mock", { method: "POST" });
+  if (!res.ok) {
+    throw new Error("Mock ihbar oluşturulamadı.");
+  }
+  return res.json();
+}
+
 export async function updateAdminReportStatus(
-  adminKey: string,
   id: string,
   status: ReportStatus,
   adminNote?: string,
 ): Promise<AdminReport> {
   const res = await fetch(`/api/admin/reports/${id}`, {
     method: "PATCH",
-    headers: adminHeaders(adminKey),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status, admin_note: adminNote }),
   });
-  if (res.status === 401) {
-    throw new Error("UNAUTHORIZED");
-  }
-  if (res.status === 503) {
-    const payload = (await res.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(payload?.error ?? "Admin yapılandırması eksik.");
-  }
   if (!res.ok) {
     throw new Error("Durum güncellenemedi.");
   }

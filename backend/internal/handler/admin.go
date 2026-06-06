@@ -3,9 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 
 	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/models"
+	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/seed"
 	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/store"
 )
 
@@ -27,11 +27,6 @@ func (h *AdminHandler) List(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	if !h.authorize(r) {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(h.Store.ListSummaries())
 }
@@ -41,11 +36,6 @@ func (h *AdminHandler) Get(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	if !h.authorize(r) {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
-		return
-	}
-
 	id := r.PathValue("id")
 	if id == "" {
 		http.Error(w, "invalid report id", http.StatusBadRequest)
@@ -67,11 +57,6 @@ func (h *AdminHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	if !h.authorize(r) {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
-		return
-	}
-
 	id := r.PathValue("id")
 	if id == "" {
 		http.Error(w, "invalid report id", http.StatusBadRequest)
@@ -98,12 +83,22 @@ func (h *AdminHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(report)
 }
 
-func (h *AdminHandler) authorize(r *http.Request) bool {
-	expected := os.Getenv("ADMIN_API_KEY")
-	if expected == "" {
-		return false
+func (h *AdminHandler) SeedMock(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
-	return r.Header.Get("X-Admin-Key") == expected
+
+	report, err := seed.BuildMockReport()
+	if err != nil {
+		http.Error(w, "mock ihbar oluşturulamadı: "+err.Error(), http.StatusBadGateway)
+		return
+	}
+
+	h.Store.Add(report)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(report)
 }
 
 func isValidStatus(status string) bool {
