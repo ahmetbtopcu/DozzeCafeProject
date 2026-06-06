@@ -1,0 +1,73 @@
+{
+  "description": "Model doğrulama test seti — ham görüntüler gitignore (KVKK). Manifest commit edilir.",
+  "usage": "DEMO_MODE=false ile ai-service detect/anonymize endpoint'lerinde veya scripts/run-test-batch.py ile çalıştırın.",
+  "samples": [
+    {
+      "id": "test-sidewalk-01",
+      "file": "data/test/sidewalk_occupation/sidewalk_car_01.jpg",
+      "expected_violation": "sidewalk_occupation",
+      "source": "user",
+      "note": "Ticari teşhir — buzdolabı, kasa, çip standı (kaldırım işgali)"
+    },
+    {
+      "id": "test-sidewalk-02",
+      "file": "data/test/sidewalk_occupation/sidewalk_car_02.jpg",
+      "expected_violation": "sidewalk_occupation",
+      "source": "user",
+      "note": "Beyaz van tamamen kaldırımda"
+    },
+    {
+      "id": "test-sidewalk-03",
+      "file": "data/test/sidewalk_occupation/sidewalk_car_03.jpg",
+      "expected_violation": "sidewalk_occupation",
+      "source": "user",
+      "note": "Gümüş hatchback dükkan önü kaldırımda"
+    },
+    {
+      "id": "test-sidewalk-04",
+      "file": "data/test/sidewalk_occupation/sidewalk_car_04.jpg",
+      "expected_violation": "sidewalk_occupation",
+      "source": "user",
+      "note": "Beyaz araç arka tekerlek kaldırım taşında"
+    },
+    {
+      "id": "test-sidewalk-05",
+      "file": "data/test/sidewalk_occupation/sidewalk_car_05.jpg",
+      "expected_violation": "sidewalk_occupation",
+      "source": "user",
+      "note": "Mavi sedan — dokunsal sarı şerit üzerinde; plaka görünür (blur testi)"
+    },
+    {
+      "id": "test-road-01",
+      "file": "data/test/road_damage/pothole_01.jpg",
+      "expected_violation": "road_damage",
+      "source": "wikimedia",
+      "license": "CC BY-SA / Commons",
+      "note": "Büyük asfalt çukuru"
+    },
+    {
+      "id": "test-road-02",
+      "file": "data/test/road_damage/pothole_02.jpg",
+      "expected_violation": "road_damage",
+      "source": "pexels",
+      "license": "Pexels License",
+      "note": "Yol yüzeyi hasarı / çatlak"
+    },
+    {
+      "id": "test-garbage-01",
+      "file": "data/test/garbage_pile/garbage_01.jpg",
+      "expected_violation": "garbage_pile",
+      "source": "pexels",
+      "license": "Pexels License",
+      "note": "Çöp / atık yığını"
+    },
+    {
+      "id": "test-garbage-02",
+      "file": "data/test/garbage_pile/garbage_02.jpg",
+      "expected_violation": "garbage_pile",
+      "source": "pexels",
+      "license": "Pexels License",
+      "note": "Sokak atığı / moloz benzeri yığın"
+    }
+  ]
+}

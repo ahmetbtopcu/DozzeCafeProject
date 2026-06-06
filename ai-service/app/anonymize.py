@@ -1,4 +1,8 @@
-"""KVKK: YuNet (yüz) + LPD-YuNet (plaka) blur — model öncesi."""
+"""KVKK: YuNet ile yalnızca insan yüzü blur — model öncesi.
+
+Not: Araç plakaları blur'lanmaz (ürün gereksinimi). Sadece kişisel veri
+niteliğindeki insan yüzleri anonimleştirilir.
+"""
 from __future__ import annotations
 
 import base64
@@ -9,12 +13,11 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from app.config import FACE_MODEL, MAX_IMAGE_WIDTH, PLATE_MODEL
+from app.config import FACE_MODEL, MAX_IMAGE_WIDTH
 
 logger = logging.getLogger(__name__)
 
 _face_detector = None
-_plate_detector = None
 
 
 def _resize_if_needed(img: np.ndarray) -> np.ndarray:
@@ -43,24 +46,6 @@ def _get_face_detector():
     return _face_detector
 
 
-def _get_plate_detector():
-    global _plate_detector
-    if _plate_detector is not None:
-        return _plate_detector
-    if not PLATE_MODEL.is_file():
-        logger.warning("LPD-YuNet model missing: %s", PLATE_MODEL)
-        return None
-    _plate_detector = cv2.FaceDetectorYN.create(
-        str(PLATE_MODEL),
-        "",
-        (320, 320),
-        score_threshold=0.5,
-        nms_threshold=0.3,
-        top_k=5000,
-    )
-    return _plate_detector
-
-
 def _expand_box(x: int, y: int, w: int, h: int, pad_ratio: float, img_w: int, img_h: int) -> tuple[int, int, int, int]:
     pad = int(max(w, h) * pad_ratio)
     x1 = max(0, x - pad)
@@ -86,9 +71,13 @@ def _blur_region(img: np.ndarray, x1: int, y1: int, x2: int, y2: int, *, pixelat
 def _detect_boxes(detector, img: np.ndarray) -> list[tuple[int, int, int, int]]:
     if detector is None:
         return []
-    h, w = img.shape[:2]
-    detector.setInputSize((w, h))
-    _, faces = detector.detect(img)
+    try:
+        h, w = img.shape[:2]
+        detector.setInputSize((w, h))
+        _, faces = detector.detect(img)
+    except cv2.error as exc:
+        logger.warning("YuNet detect failed: %s", exc)
+        return []
     if faces is None:
         return []
     boxes: list[tuple[int, int, int, int]] = []
@@ -112,11 +101,6 @@ def anonymize_image_bytes(data: bytes) -> tuple[bytes, int]:
     for x, y, bw, bh in _detect_boxes(_get_face_detector(), img):
         x1, y1, x2, y2 = _expand_box(x, y, bw, bh, 0.15, w, h)
         _blur_region(img, x1, y1, x2, y2, pixelate=False)
-        blur_count += 1
-
-    for x, y, bw, bh in _detect_boxes(_get_plate_detector(), img):
-        x1, y1, x2, y2 = _expand_box(x, y, bw, bh, 0.10, w, h)
-        _blur_region(img, x1, y1, x2, y2, pixelate=True)
         blur_count += 1
 
     ok, buf = cv2.imencode(".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
