@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/client"
@@ -56,6 +57,8 @@ func (h *ReportHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	meta := parseReportMeta(r)
+
 	report, err := h.processReport(image, lat, lng)
 	if err != nil {
 		if h.Demo {
@@ -66,6 +69,7 @@ func (h *ReportHandler) Create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	applyReportMeta(report, meta)
 	h.Store.Add(*report)
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(report)
@@ -127,6 +131,7 @@ func (h *ReportHandler) processReport(image []byte, lat, lng float64) (*models.R
 	return &models.Report{
 		ID:          uuid.New().String(),
 		CreatedAt:   time.Now().UTC(),
+		Status:      models.ReportStatusPending,
 		Lat:         lat,
 		Lng:         lng,
 		ImageBase64: pipe.ImageBase64,
@@ -145,10 +150,53 @@ func (h *ReportHandler) processReport(image []byte, lat, lng float64) (*models.R
 	}, nil
 }
 
+func parseReportMeta(r *http.Request) reportMeta {
+	reporterName := r.FormValue("reporter_name")
+	if reporterName == "" {
+		reporterName = strings.TrimSpace(r.FormValue("reporter_first_name") + " " + r.FormValue("reporter_last_name"))
+	}
+
+	return reportMeta{
+		UserViolationType: r.FormValue("violation_type"),
+		Details:           r.FormValue("details"),
+		Address: models.Address{
+			City:         r.FormValue("city"),
+			District:     r.FormValue("district"),
+			Neighborhood: r.FormValue("neighborhood"),
+			Avenue:       r.FormValue("avenue"),
+			Street:       r.FormValue("street"),
+			BuildingNo:   r.FormValue("building_no"),
+		},
+		Reporter: models.Reporter{
+			FirstName: r.FormValue("reporter_first_name"),
+			LastName:  r.FormValue("reporter_last_name"),
+			Name:      reporterName,
+			Email:     r.FormValue("reporter_email"),
+			Phone:     r.FormValue("reporter_phone"),
+		},
+	}
+}
+
+type reportMeta struct {
+	UserViolationType string
+	Details           string
+	Address           models.Address
+	Reporter          models.Reporter
+}
+
+func applyReportMeta(report *models.Report, meta reportMeta) {
+	report.Status = models.ReportStatusPending
+	report.UserViolationType = meta.UserViolationType
+	report.Details = meta.Details
+	report.Address = meta.Address
+	report.Reporter = meta.Reporter
+}
+
 func demoReport(lat, lng float64) *models.Report {
 	return &models.Report{
 		ID:             uuid.New().String(),
 		CreatedAt:      time.Now().UTC(),
+		Status:         models.ReportStatusPending,
 		Lat:            lat,
 		Lng:            lng,
 		BlurCount:      2,

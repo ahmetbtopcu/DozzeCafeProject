@@ -12,7 +12,7 @@ Render free tier cold start ~30–60 sn. Canlı URL:
 Vatandaş ihlal görüyor ama hangi kuruma şikayet edeceğini bilmiyor.
 
 ## 0:30–1:30 Canlı Demo
-1. Web veya Expo'dan foto yükle
+1. Web panelden foto yükle
 2. **YuNet blur** (blur sayısı)
 3. İhlal + şiddet (demo cache veya YOLO)
 4. Yetki yönlendirici + dilekçe

@@ -1,6 +1,6 @@
 ---
 description: Teknoloji yığını ve dosya bazlı geliştirme kuralları
-globs: web/**,mobile/**,backend/**
+globs: web/**,backend/**
 alwaysApply: false
 ---
 
@@ -11,10 +11,6 @@ alwaysApply: false
 - API anahtarları yalnızca server tarafında; `NEXT_PUBLIC_` yalnızca gerçekten
   public olan değerler için.
 - Vercel'e deploy; build hatasız geçmeli.
-
-## mobile/ (Expo)
-- TypeScript. `expo` SDK üzerinden; native modül eklerken EAS uyumuna dikkat.
-- Backend'e ortam değişkeni ile bağlan (`EXPO_PUBLIC_API_URL`).
 
 ## backend/ (Go + masterfabric-go)
 - Resmî masterfabric-go mimarisine birebir uy; katman yapısını bozma.

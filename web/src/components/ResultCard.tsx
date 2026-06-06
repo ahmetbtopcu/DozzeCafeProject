@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { Report } from "@/lib/api";
 
 type Props = {
@@ -9,17 +10,24 @@ type Props = {
 export default function ResultCard({ report }: Props) {
   if (!report) {
     return (
-      <div className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500">
-        Fotoğraf yükleyin — dilekçe burada görünecek
-      </div>
+      <section className="border-t border-emerald-100 pt-8 text-sm text-zinc-500 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+        <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-700">Çıktı</p>
+        <h3 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-950">
+          Dilekçe burada görünecek.
+        </h3>
+        <p className="mt-3 leading-6">
+          Fotoğrafı yükleyip ihbarı gönderdiğinizde kurum, şiddet skoru ve resmi başvuru metni oluşur.
+        </p>
+      </section>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+    <section className="flex flex-col gap-5 border-t border-emerald-100 pt-8 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h3 className="text-lg font-semibold text-zinc-900">{report.violation_label}</h3>
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-700">Analiz sonucu</p>
+          <h3 className="mt-2 text-2xl font-semibold text-zinc-950">{report.violation_label}</h3>
           <p className="text-sm text-zinc-500">
             Şiddet: <span className="font-medium">{report.severity.level}</span> ({report.severity.score}/100)
           </p>
@@ -30,14 +38,17 @@ export default function ResultCard({ report }: Props) {
       </div>
 
       {report.image_base64 && (
-        <img
+        <Image
           src={`data:image/jpeg;base64,${report.image_base64}`}
           alt="Anonimleştirilmiş kanıt"
-          className="max-h-48 w-full rounded-lg object-cover"
+          width={720}
+          height={360}
+          unoptimized
+          className="max-h-56 w-full rounded-3xl object-cover"
         />
       )}
 
-      <div className="rounded-lg bg-zinc-50 p-3 text-sm">
+      <div className="border-y border-emerald-100 py-4 text-sm">
         <p className="font-medium text-zinc-800">Sorumlu kurum</p>
         <p>{report.authority?.authority}</p>
         <p className="mt-1 text-zinc-600">{report.authority?.channel} — {report.authority?.law_ref}</p>
@@ -45,12 +56,12 @@ export default function ResultCard({ report }: Props) {
 
       <div>
         <p className="mb-2 text-sm font-medium text-zinc-800">Dilekçe</p>
-        <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-zinc-900 p-4 text-xs text-zinc-100">
+        <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-3xl bg-zinc-950 p-5 text-xs leading-6 text-zinc-100">
           {report.petition}
         </pre>
       </div>
 
       <p className="text-xs text-zinc-400">Blur: {report.blur_count} alan | KVKK uyumlu</p>
-    </div>
+    </section>
   );
 }

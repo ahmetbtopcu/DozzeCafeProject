@@ -23,8 +23,8 @@ type healthResponse struct {
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Admin-Key")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
@@ -37,6 +37,7 @@ func main() {
 	ai := client.NewAIService()
 	st := store.NewMemoryStore()
 	reports := handler.NewReportHandler(ai, st)
+	admin := handler.NewAdminHandler(st)
 
 	mux := http.NewServeMux()
 
@@ -64,6 +65,10 @@ func main() {
 
 	mux.HandleFunc("/api/reports/map", reports.Map)
 	mux.HandleFunc("/api/reports/stats", reports.Stats)
+
+	mux.HandleFunc("GET /api/admin/reports", admin.List)
+	mux.HandleFunc("GET /api/admin/reports/{id}", admin.Get)
+	mux.HandleFunc("PATCH /api/admin/reports/{id}", admin.UpdateStatus)
 
 	port := os.Getenv("PORT")
 	if port == "" {
