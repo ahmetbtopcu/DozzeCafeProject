@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Builds
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Expo
+.expo/
+.expo-shared/
+mobile/.expo/
+web-build/
+
+# Go
+backend/bin/
+backend/tmp/
+*.exe
+*.test
+vendor/
+
+# Env & secrets (KVKK: gizli anahtarlar repoya girmez)
+.env
+.env*.local
+.env.development
+.env.production
+*.pem
+*.key
+
+# Google / API anahtarları
+**/secrets/
+gcp-key.json
+service-account*.json
+
+# HAM VERİ — KVKK gereği ham görüntüler asla repoya yüklenmez
+data/raw/
+**/raw_images/
+*.raw
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
+npm-debug.log*
+
+# Vercel / Render
+.vercel
+.render
