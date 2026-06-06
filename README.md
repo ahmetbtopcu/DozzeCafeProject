@@ -1,106 +1,69 @@
-# Güngören Projesi — AI-Driven Kentsel Çözüm
+# Nöbetçi — Otomatik Belediye Hesap Sorma Motoru
 
-> Cursor Hackathon (6 Haziran 2026, Dozze Coffee Başakşehir) için geliştirilen,
-> kentsel objelerin bilgisayarlı görü ile tespitine dayalı, kamu faydası odaklı
-> proje.
+> Cursor Hackathon (6 Haziran 2026) — Sokak ihlallerini fotoğrafla, CV ile sınıflandır,
+> doğru kuruma yönlendir, mevzuat maddesiyle hukuki dilekçe üret.
 
-**Fikir (veri geldikten sonra netleşecek):** _Google Street View görüntüleri üzerinden
-kentsel obje (tabela, çöp kutusu, hasarlı yol vb.) tespiti ve haritalama._
+## Problem
+Türkiye'de kaldırım işgali, çukur, kırık tabela ve çöp en çok şikayet edilen konular.
+Vatandaşlar CİMER/153'e yazıyor ama **hangi kuruma, hangi maddeyle** şikayet edeceğini bilmiyor.
 
----
+## Çözüm
+1. Fotoğraf yükle → yüz/plaka **anonimleştirilir** (KVKK).
+2. CV ihlal türünü tespit eder.
+3. RAG mevzuat maddesini ve **sorumlu kurumu** bulur (yetki yönlendirici).
+4. Resmi dilekçe otomatik üretilir.
+5. Haritada ihlaller ve istatistikler görüntülenir.
 
-## 🏗️ Mimari (Monorepo)
+## Mimari
 
 | Klasör | Teknoloji | Hosting |
 |--------|-----------|---------|
-| `web/` | Next.js (TypeScript, App Router, Tailwind) | Vercel |
-| `mobile/` | Expo (TypeScript) | — |
-| `backend/` | Go (Golang) — **masterfabric-go mimarisi** | Render.com |
-| `docs/` | KVKK belgeleri + kriter çizelgesi | — |
-| `.cursor/rules/` | Agentic ruleset | — |
+| `web/` | Next.js + Leaflet | Vercel |
+| `mobile/` | Expo | — |
+| `backend/` | Go (masterfabric-go) | Render |
+| `ai-service/` | Python FastAPI + HF modelleri | Render |
+| `docs/` | KVKK + mevzuat corpus | — |
 
-> Backend mimarisi etkinlik başında (11:00) teslim edilen resmî **masterfabric-go**
-> yapısına birebir uyar. Şu anki `backend/` içeriği geçici placeholder'dır.
+## Kurulum
 
----
-
-## 🚀 Kurulum
-
-### Gereksinimler
-- Node.js 18+ (mevcut: v22)
-- Go 1.22+ (backend için kurulmalı)
-- Git
-
-### Web (Next.js)
 ```bash
-cd web
-npm install
-npm run dev        # http://localhost:3000
-```
+# AI servis
+cd ai-service
+python -m venv .venv
+.venv\Scripts\activate   # Windows
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8001
 
-### Mobile (Expo)
-```bash
-cd mobile
-npm install
-npx expo start
-```
-
-### Backend (Go)
-```bash
+# Backend
 cd backend
-go run ./cmd/api   # http://localhost:8080/health
+go run ./cmd/api
+
+# Web
+cd web && npm install && npm run dev
+
+# Mobile
+cd mobile && npm install && npx expo start
 ```
 
 ### Ortam değişkenleri
-`.env.example`'ı kopyalayıp doldurun. Anahtarlar **asla** commit edilmez.
-```
-GOOGLE_STREET_VIEW_API_KEY=...
-HUGGINGFACE_TOKEN=...
-NEXT_PUBLIC_API_URL=http://localhost:8080
-EXPO_PUBLIC_API_URL=http://localhost:8080
-```
+`.env.example` dosyasını `.env` olarak kopyalayın.
 
----
+## AI Araçları (jüri dökümantasyonu)
 
-## 🤖 AI Araçları ve Cursor Kullanımı
+### Cursor IDE + Agentic Ruleset
+- `.cursor/rules/` — proje, KVKK, commit, stack, `proje-spec.mdc`
+- Plan-then-execute: önce mimari plan, sonra faz faz implementasyon
 
-> Bu bölüm jüri değerlendirmesinin parçasıdır (AI Adaptasyonu — 10 puan).
-> Geliştirme ilerledikçe doldurulacaktır.
+### Modeller (Hugging Face)
+- YOLO-World — açık sözlük ihlal tespiti
+- RDD2022 weights — yol hasarı
+- turkish-e5-large — mevzuat RAG embedding
+- Depth Anything V2 (opsiyonel) — şiddet ölçümü
 
-### Cursor IDE
-- Tüm geliştirme Cursor IDE üzerinde yapıldı.
-- **Agentic Ruleset** (`.cursor/rules/`): Projenin değişmez kısıtları, KVKK
-  kuralları, commit disiplini ve stack kuralları agent davranışına gömüldü:
-  - `00-proje.mdc` — proje bağlamı + değişmez kısıtlar (alwaysApply)
-  - `kvkk.mdc` — KVKK kırmızı çizgileri (alwaysApply)
-  - `git-commit.mdc` — commit disiplini (alwaysApply)
-  - `stack.mdc` — dosya bazlı stack kuralları (globs)
+### KVKK
+- Anonimleştirme pipeline model öncesi
+- Ham görüntü `data/raw/` — `.gitignore` korumalı
+- `docs/KVKK-veri-imha-belgesi.md` + `scripts/purge-raw-data.ps1`
 
-### Prompt Teknikleri
-- _(doldurulacak: kullanılan spesifik prompt yaklaşımları, plan-then-execute vb.)_
-
-### Cursor CLI / SDK (ekstra puan)
-- _(doldurulacak: otomasyon/test/commit akışında CLI veya SDK kullanımı)_
-
-### Hugging Face
-- _(doldurulacak: kullanılan model/dataset, neden seçildiği)_
-
----
-
-## 🔒 KVKK ve Etik Uyum
-
-- Modeller **yalnızca cansız kentsel objeler** için kullanılır.
-- İnsan yüzü / araç plakası model çalışmadan önce **geri döndürülemez** biçimde
-  bulanıklaştırılır.
-- Ham veriler repoya/şifrelenmemiş buluta yüklenmez (`.gitignore` korumalı).
-- Hackathon sonunda ham görüntüler silinir; bkz. `docs/KVKK-veri-imha-belgesi.md`.
-
----
-
-## 📝 Geliştirme Disiplini
-
-- Aşamalı, anlamlı commit'ler (Conventional Commits). Tek parça yükleme yapılmaz.
-- Stack dışına çıkılmaz; masterfabric-go mimarisi bozulmaz.
-
-## 👥 Takım
-- _______________ , _______________
+## Takım
+- Ahmet Bayram Topcu + Memo

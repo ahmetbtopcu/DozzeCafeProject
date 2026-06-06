@@ -1,0 +1,38 @@
+---
+description: Nobetci proje spesifikasyonu — mimari, ihlal siniflari, yetki eslemesi
+alwaysApply: true
+---
+
+# Nöbetçi — Otomatik Belediye Hesap Sorma Motoru
+
+## Akış
+1. Vatandaş ihlal fotoğrafı yükler (Expo/web).
+2. **Anonimleştirme** (yüz/plaka blur) — model öncesi, KVKK zorunlu.
+3. **CV tespit** → ihlal türü + bbox + güven.
+4. **Şiddet skoru** (bbox/derinlik).
+5. **RAG** → mevzuat maddesi + **yetki yönlendirici** (sorumlu kurum).
+6. **Dilekçe üretimi** (CİMER/BİMER formatı).
+7. Panel: harita + dilekçe + istatistik.
+
+## Monorepo
+- `web/` — Next.js panel (Vercel)
+- `mobile/` — Expo (foto + ihbar)
+- `backend/` — Go API, masterfabric-go uyumlu (Render)
+- `ai-service/` — Python FastAPI (CV + RAG + dilekçe, Render)
+- `docs/mevzuat/` — RAG corpus (commit edilir, ham görüntü değil)
+
+## İhlal sınıfları (MVP)
+| Kod | Tür | Sorumlu kurum |
+|-----|-----|---------------|
+| `sidewalk_occupation` | Kaldırım işgali | İlçe Belediyesi Zabıta |
+| `road_damage` | Çukur / bozuk yol | İlçe Belediyesi / KGM (ana arter) |
+| `broken_sign` | Kırık / devrik tabela | İBB Ulaşım / KGM |
+| `garbage_pile` | Çöp / moloz | İlçe Belediyesi Temizlik |
+
+## API sözleşmesi
+- Go: `POST /api/reports` (multipart image + lat/lng), `GET /api/reports`, `GET /api/reports/map`
+- AI: `POST /anonymize`, `/detect`, `/severity`, `/petition`, `GET /health`
+- Go → AI HTTP orkestrasyonu; istemciler yalnızca Go'ya konuşur.
+
+## Demo modu
+`DEMO_MODE=true` veya `ai-service` erişilemezse cache'li örnekler (`ai-service/demo/cache.json`).
