@@ -1,0 +1,32 @@
+---
+description: KVKK ve veri güvenliği kuralları — kırmızı çizgi (her zaman uygulanır)
+alwaysApply: true
+---
+
+# KVKK & Veri Güvenliği — KIRMIZI ÇİZGİ
+
+İhlal doğrudan diskalifiye sebebidir. Bu kurallar pazarlık konusu değildir.
+
+## Amaç sınırlaması
+- Modeller YALNIZCA cansız kentsel objeler için kullanılır (tabela, çöp kutusu,
+  hasarlı yol, kaldırım vb.).
+- Kimlik tespiti, yüz tanıma, plaka okuma, kişi/araç takibi, profilleme **YASAK**.
+
+## Zorunlu anonimleştirme (model çalışmadan ÖNCE)
+- İnsan yüzleri ve araç plakaları **geri döndürülemez** şekilde bulanıklaştırılır.
+- Anonimleştirme adımı pipeline'da model eğitiminden/çıkarımından ÖNCE gelir.
+- Bulanıklaştırma irreversible olmalı (blur + downsample), maskeleme yetmez.
+
+## Veri güvenliği
+- Ham veriler şifrelenmemiş bulut depolamaya veya açık repoya YÜKLENEMEZ.
+- `data/raw/` ve ham görüntü klasörleri `.gitignore`'da; commit edilmez.
+- API anahtarları yalnızca `.env` içinde; kodda hardcode edilmez.
+
+## Silme taahhüdü
+- Hackathon sonunda tüm ham görüntüler kalıcı silinir.
+- Silme işlemi `docs/KVKK-veri-imha-belgesi.md` içinde yazılı belgelenir.
+
+## Kod üretirken
+- Yüz/plaka tespiti ekleniyorsa, amacı SADECE bulanıklaştırma olmalı; sonuç
+  saklanmamalı, kimliklendirme için kullanılmamalı.
+- Yeni veri depolama kodu yazarken anonimleştirme adımının var olduğunu doğrula.

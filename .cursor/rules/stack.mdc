@@ -1,0 +1,26 @@
+---
+description: Teknoloji yığını ve dosya bazlı geliştirme kuralları
+globs: web/**,mobile/**,backend/**
+alwaysApply: false
+---
+
+# Teknoloji Yığını Kuralları
+
+## web/ (Next.js)
+- TypeScript + App Router + Tailwind. Server Components varsayılan.
+- API anahtarları yalnızca server tarafında; `NEXT_PUBLIC_` yalnızca gerçekten
+  public olan değerler için.
+- Vercel'e deploy; build hatasız geçmeli.
+
+## mobile/ (Expo)
+- TypeScript. `expo` SDK üzerinden; native modül eklerken EAS uyumuna dikkat.
+- Backend'e ortam değişkeni ile bağlan (`EXPO_PUBLIC_API_URL`).
+
+## backend/ (Go + masterfabric-go)
+- Resmî masterfabric-go mimarisine birebir uy; katman yapısını bozma.
+- Yeni özellik = mevcut katman desenini takip et (handler/usecase/repository).
+- Render.com'da çalışacak şekilde `PORT` env değişkenini oku.
+
+## Harici servisler
+- Google Street View API: istek sayısını logla, 10.000 ücretsiz kotayı aşma.
+- Hugging Face: model/dataset referanslarını README'de belgele.

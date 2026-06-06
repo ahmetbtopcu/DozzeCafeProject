@@ -1,0 +1,24 @@
+---
+description: Commit disiplini ve versiyon kontrolü kuralları
+alwaysApply: true
+---
+
+# Commit Disiplini
+
+Jüri geliştirme sürecini commit geçmişi üzerinden değerlendirir. Tek parça
+yükleme KABUL EDİLMEZ (puan silme / diskalifiye sebebi).
+
+## Kurallar
+- Her anlamlı, çalışan değişiklikten sonra commit at (özellik, fix, refactor).
+- Commit mesajları anlamlı ve Conventional Commits formatında olsun:
+  - `feat(web): tabela tespiti sonuç kartı eklendi`
+  - `fix(backend): street view istek limiti hatası giderildi`
+  - `docs: KVKK veri imha belgesi güncellendi`
+  - `chore`, `refactor`, `test`, `style` de kullanılabilir.
+- Türkçe ve açıklayıcı; "wip", "update", "asdf" gibi anlamsız mesajlar YOK.
+- Küçük ve sık commit > büyük tek commit.
+
+## Yapılmayacaklar
+- `.env`, anahtar dosyaları, ham görüntüler commit edilmez (bkz. `.gitignore`).
+- `--force` push ana dala yapılmaz.
+- Tek seferde tüm projeyi tek commit'te yükleme.

@@ -1,0 +1,30 @@
+---
+description: Proje genel bağlamı, mimari ve değişmez kısıtlar (her zaman uygulanır)
+alwaysApply: true
+---
+
+# Cursor Hackathon — AI-Driven Kentsel Çözüm
+
+## Bağlam
+Kentsel objelerin (tabela, çöp kutusu, hasarlı yol vb.) bilgisayarlı görü ile
+tespitine dayalı, kamu faydası odaklı bir proje. Veri kaynağı ağırlıklı olarak
+Google Street View görüntüleri + sayısal veriler.
+
+## Monorepo yapısı
+- `web/`     → Next.js (TypeScript, App Router) — Vercel'e deploy
+- `mobile/`  → Expo (TypeScript) — cross-platform
+- `backend/` → Go (Golang) — Render.com'a deploy. **Mimari masterfabric-go yapısına
+  birebir uyar.** (Resmî mimari etkinlik başında teslim edilir; bu yapıyı bozma.)
+- `docs/`    → KVKK belgeleri + teknik kriter çizelgesi
+
+## Değişmez kısıtlar (kural ihlali = puan kaybı / diskalifiye)
+1. Stack dışına çıkma: Next.js / Expo / Go / Hugging Face / Google Street View API.
+2. Backend'de masterfabric-go mimarisini değiştirme; sadece feature ekle.
+3. KVKK kurallarına uy (bkz. `kvkk.mdc`) — ihlal doğrudan diskalifiye.
+4. Her anlamlı değişiklikten sonra commit at (bkz. `git-commit.mdc`).
+5. AI kullanımını README'de şeffaf belgele.
+
+## Çalışma tarzı
+- Windows + PowerShell ortamı: komutları `&&` yerine `;` ile zincirle.
+- Önce çalışan en küçük parçayı kur (canlı demo > mükemmel kod).
+- Gizli anahtarlar `.env`'de; asla repoya commit edilmez.
