@@ -9,7 +9,8 @@
       "severity": { "score": 78, "level": "critical", "primary_type": "sidewalk_occupation", "primary_label": "Kaldırım işgali" },
       "detections": [{ "type": "sidewalk_occupation", "label": "Kaldırım işgali", "confidence": 0.89, "bbox": [0.2, 0.5, 0.8, 0.9] }],
       "authority": { "authority": "İlçe Belediyesi Zabıta Müdürlüğü", "channel": "CİMER / 153", "law_ref": "5326 md. 32, 38" },
-      "petition_snippet": "Kaldırıma park edilmiş araç nedeniyle yayaların yürüyüş hakkı engellenmektedir."
+      "petition_snippet": "Kaldırıma park edilmiş araç nedeniyle yayaların yürüyüş hakkı engellenmektedir.",
+      "demo": true
     },
     {
       "id": "demo-002",

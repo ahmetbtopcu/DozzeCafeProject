@@ -58,8 +58,12 @@ func (h *ReportHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	report, err := h.processReport(image, lat, lng)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadGateway)
-		return
+		if h.Demo {
+			report = demoReport(lat, lng)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadGateway)
+			return
+		}
 	}
 
 	h.Store.Add(*report)
@@ -70,11 +74,9 @@ func (h *ReportHandler) Create(w http.ResponseWriter, r *http.Request) {
 func (h *ReportHandler) processReport(image []byte, lat, lng float64) (*models.Report, error) {
 	pipe, err := h.AI.Pipeline(image)
 	if err != nil {
-		if h.Demo {
-			return demoReport(lat, lng), nil
-		}
 		return nil, fmt.Errorf("ai pipeline: %w", err)
 	}
+	isDemo := h.Demo || pipe.Demo
 
 	vtype := pipe.Severity.PrimaryType
 	if vtype == "" && len(pipe.Detections) > 0 {
@@ -90,6 +92,12 @@ func (h *ReportHandler) processReport(image []byte, lat, lng float64) (*models.R
 	}
 	pet, err := h.AI.Petition(vtype, lat, lng, sevMap)
 	if err != nil {
+		if isDemo {
+			dr := demoReport(lat, lng)
+			dr.ImageBase64 = pipe.ImageBase64
+			dr.BlurCount = pipe.BlurCount
+			return dr, nil
+		}
 		return nil, fmt.Errorf("ai petition: %w", err)
 	}
 
@@ -133,6 +141,7 @@ func (h *ReportHandler) processReport(image []byte, lat, lng float64) (*models.R
 		Authority:       auth,
 		LegalReferences: refs,
 		Petition:        pet.Petition,
+		Demo:            isDemo,
 	}, nil
 }
 

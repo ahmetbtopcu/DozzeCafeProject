@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
+import BackendStatus from "@/components/BackendStatus";
 import UploadForm from "@/components/UploadForm";
 import ResultCard from "@/components/ResultCard";
 import StatsPanel from "@/components/StatsPanel";
@@ -36,8 +37,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <h1 className="text-2xl font-bold text-zinc-900">Nöbetçi</h1>
-        <p className="text-sm text-zinc-600">Otomatik Belediye Hesap Sorma Motoru</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-900">Nöbetçi</h1>
+            <p className="text-sm text-zinc-600">Otomatik Belediye Hesap Sorma Motoru</p>
+          </div>
+          <BackendStatus />
+        </div>
       </header>
 
       <main className="mx-auto grid max-w-7xl gap-6 p-6 lg:grid-cols-3">

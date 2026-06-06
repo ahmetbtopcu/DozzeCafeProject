@@ -1,4 +1,6 @@
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8080";
+/** Canlı backend — Expo'da EXPO_PUBLIC_API_URL ayarlayın. */
+export const API_URL =
+  process.env.EXPO_PUBLIC_API_URL ?? "https://nobetci-backend.onrender.com";
 
 export type Report = {
   id: string;
@@ -9,6 +11,18 @@ export type Report = {
   image_base64?: string;
   demo?: boolean;
 };
+
+export type HealthStatus = {
+  status: string;
+  service: string;
+  ai_healthy: boolean;
+};
+
+export async function fetchHealth(): Promise<HealthStatus> {
+  const res = await fetch(`${API_URL}/health`);
+  if (!res.ok) throw new Error("Backend erişilemiyor");
+  return res.json();
+}
 
 export async function submitReport(
   uri: string,

@@ -1,18 +1,17 @@
 """Nöbetçi AI Service — FastAPI uydu servisi."""
 from __future__ import annotations
 
-import base64
 from typing import Any, Optional
 
-from fastapi import FastAPI, File, Form, UploadFile
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app import anonymize, demo, detect, petition, rag, severity
+from app import anonymize, demo, detect, detect_specialists, petition, rag, severity
 from app.authority import route_authority
-from app.config import DEMO_MODE
+from app.config import DEMO_MODE, ENABLE_SPECIALIST_MODELS
 
-app = FastAPI(title="Nobetci AI Service", version="0.1.0")
+app = FastAPI(title="Nobetci AI Service", version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,7 +23,12 @@ app.add_middleware(
 
 @app.get("/health")
 def health() -> dict[str, Any]:
-    return {"status": "ok", "service": "nobetci-ai-service", "demo_mode": DEMO_MODE}
+    return {
+        "status": "ok",
+        "service": "nobetci-ai-service",
+        "demo_mode": DEMO_MODE,
+        "specialist_models": ENABLE_SPECIALIST_MODELS,
+    }
 
 
 class AnonymizeResponse(BaseModel):
@@ -42,13 +46,35 @@ async def anonymize_endpoint(file: UploadFile = File(...)) -> AnonymizeResponse:
 
 class DetectResponse(BaseModel):
     detections: list[dict[str, Any]]
+    demo: bool = False
 
 
 @app.post("/detect", response_model=DetectResponse)
 async def detect_endpoint(file: UploadFile = File(...)) -> DetectResponse:
     data = await file.read()
-    dets = detect.detect_violations(data)
-    return DetectResponse(detections=dets)
+    anon, _ = anonymize.anonymize_image_bytes(data)
+    dets = detect.detect_violations(anon)
+    used_demo = False
+    if not dets:
+        dets, _ = demo.demo_detections_from_cache()
+        used_demo = True
+    return DetectResponse(detections=dets, demo=used_demo)
+
+
+@app.post("/detect/pothole", response_model=DetectResponse)
+async def detect_pothole_endpoint(file: UploadFile = File(...)) -> DetectResponse:
+    data = await file.read()
+    anon, _ = anonymize.anonymize_image_bytes(data)
+    dets = detect_specialists.detect_pothole(anon)
+    return DetectResponse(detections=dets, demo=not bool(dets))
+
+
+@app.post("/detect/litter", response_model=DetectResponse)
+async def detect_litter_endpoint(file: UploadFile = File(...)) -> DetectResponse:
+    data = await file.read()
+    anon, _ = anonymize.anonymize_image_bytes(data)
+    dets = detect_specialists.detect_litter(anon)
+    return DetectResponse(detections=dets, demo=not bool(dets))
 
 
 class SeverityRequest(BaseModel):
@@ -73,35 +99,45 @@ class PipelineResponse(BaseModel):
     blur_count: int
     detections: list[dict[str, Any]]
     severity: dict[str, Any]
+    demo: bool = False
 
 
 @app.get("/demo/samples")
 async def demo_samples() -> dict[str, Any]:
-    from app.demo import _load
-
-    return _load()
+    return demo._load()
 
 
 @app.post("/pipeline", response_model=PipelineResponse)
 async def pipeline_endpoint(file: UploadFile = File(...)) -> PipelineResponse:
-    """Anonimleştir → tespit → şiddet (tek çağrı)."""
+    """KVKK: anonimleştir → tespit (veya demo cache) → şiddet."""
+    data = await file.read()
+    anon, blur_count = anonymize.anonymize_image_bytes(data)
+    image_b64 = anonymize.to_base64(anon)
+    used_demo = False
+
     if DEMO_MODE:
-        d = demo.get_demo_pipeline()
+        d = demo.get_demo_pipeline(image_b64, blur_count)
         return PipelineResponse(
-            image_base64=d.get("image_base64", ""),
+            image_base64=d["image_base64"],
             blur_count=d["blur_count"],
             detections=d["detections"],
             severity=d["severity"],
+            demo=True,
         )
-    data = await file.read()
-    anon, blur_count = anonymize.anonymize_image_bytes(data)
+
     dets = detect.detect_violations(anon)
-    sev = severity.compute_severity(dets)
+    if not dets:
+        dets, sev = demo.demo_detections_from_cache()
+        used_demo = True
+    else:
+        sev = severity.compute_severity(dets)
+
     return PipelineResponse(
-        image_base64=anonymize.to_base64(anon),
+        image_base64=image_b64,
         blur_count=blur_count,
         detections=dets,
         severity=sev,
+        demo=used_demo,
     )
 
 

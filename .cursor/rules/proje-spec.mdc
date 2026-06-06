@@ -34,5 +34,14 @@ alwaysApply: true
 - AI: `POST /anonymize`, `/detect`, `/severity`, `/petition`, `GET /health`
 - Go → AI HTTP orkestrasyonu; istemciler yalnızca Go'ya konuşur.
 
+## Canlı ortam (lokal backend yok)
+- Go API: `https://nobetci-backend.onrender.com`
+- AI: `https://nobetci-ai-service.onrender.com`
+- Web/mobile yalnızca canlı URL kullanır; `localhost` fallback yok.
+
+## Blur (KVKK)
+YuNet + LPD-YuNet (`ai-service/app/anonymize.py`) — model öncesi zorunlu.
+
 ## Demo modu
-`DEMO_MODE=true` veya `ai-service` erişilemezse cache'li örnekler (`ai-service/demo/cache.json`).
+`DEMO_MODE=true` (Render free tier) — cache'li örnekler (`ai-service/demo/cache.json`).
+Sunum öncesi: `scripts/warmup-health.ps1`

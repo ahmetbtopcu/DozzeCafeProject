@@ -1,4 +1,6 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+/** Canlı backend — lokal fallback yok. Vercel'de NEXT_PUBLIC_API_URL ayarlayın. */
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "https://nobetci-backend.onrender.com";
 
 export type MapPin = {
   id: string;
@@ -31,6 +33,19 @@ export type Stats = {
   by_severity_level: Record<string, number>;
   avg_severity: number;
 };
+
+export type HealthStatus = {
+  status: string;
+  service: string;
+  ai_healthy: boolean;
+  time: string;
+};
+
+export async function fetchHealth(): Promise<HealthStatus> {
+  const res = await fetch(`${API_URL}/health`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Backend erişilemiyor");
+  return res.json();
+}
 
 export async function fetchMapPins(): Promise<MapPin[]> {
   const res = await fetch(`${API_URL}/api/reports/map`, { cache: "no-store" });

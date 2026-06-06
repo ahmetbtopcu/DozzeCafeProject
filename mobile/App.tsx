@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -11,13 +11,24 @@ import {
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import { submitReport, type Report } from "./lib/api";
+import { API_URL, fetchHealth, submitReport, type Report } from "./lib/api";
 
 export default function App() {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [backendOk, setBackendOk] = useState<boolean | null>(null);
+  const [aiOk, setAiOk] = useState(true);
+
+  useEffect(() => {
+    fetchHealth()
+      .then((h) => {
+        setBackendOk(true);
+        setAiOk(h.ai_healthy);
+      })
+      .catch(() => setBackendOk(false));
+  }, []);
 
   async function takePhoto() {
     const cam = await ImagePicker.requestCameraPermissionsAsync();
@@ -66,6 +77,16 @@ export default function App() {
       <StatusBar style="light" />
       <Text style={styles.title}>Nöbetçi</Text>
       <Text style={styles.subtitle}>İhlal fotoğrafla → dilekçe üret</Text>
+      <Text style={styles.apiHint}>API: {API_URL}</Text>
+
+      {backendOk === false && (
+        <Text style={styles.warn}>
+          Backend uyuyor — 1 dk bekleyin (Render cold start)
+        </Text>
+      )}
+      {backendOk && !aiOk && (
+        <Text style={styles.demoBadge}>Demo modu — cache'li sonuçlar</Text>
+      )}
 
       <TouchableOpacity style={styles.btnPrimary} onPress={takePhoto}>
         <Text style={styles.btnText}>Fotoğraf Çek</Text>
@@ -96,7 +117,7 @@ export default function App() {
             Şiddet: {report.severity.level} ({report.severity.score})
           </Text>
           <Text style={styles.meta}>Kurum: {report.authority?.authority}</Text>
-          {report.demo && <Text style={styles.demoBadge}>Demo modu</Text>}
+          {report.demo && <Text style={styles.demoBadge}>Demo / cache sonucu</Text>}
           <Text style={styles.petitionLabel}>Dilekçe</Text>
           <Text style={styles.petition}>{report.petition}</Text>
         </ScrollView>
@@ -113,7 +134,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: { fontSize: 28, fontWeight: "700", color: "#f8fafc" },
-  subtitle: { fontSize: 14, color: "#94a3b8", marginBottom: 24 },
+  subtitle: { fontSize: 14, color: "#94a3b8", marginBottom: 8 },
+  apiHint: { fontSize: 10, color: "#64748b", marginBottom: 16 },
+  warn: { color: "#fbbf24", fontSize: 12, marginBottom: 8 },
+  demoBadge: { color: "#fbbf24", marginTop: 6, fontSize: 12 },
   btnPrimary: {
     backgroundColor: "#059669",
     padding: 14,
@@ -141,7 +165,6 @@ const styles = StyleSheet.create({
   },
   resultTitle: { fontSize: 18, fontWeight: "600", color: "#f1f5f9" },
   meta: { color: "#94a3b8", marginTop: 4, fontSize: 13 },
-  demoBadge: { color: "#fbbf24", marginTop: 6, fontSize: 12 },
   petitionLabel: { color: "#e2e8f0", fontWeight: "600", marginTop: 12 },
   petition: { color: "#cbd5e1", fontSize: 12, marginTop: 6, lineHeight: 18 },
 });

@@ -19,7 +19,7 @@ type AIService struct {
 func NewAIService() *AIService {
 	url := os.Getenv("AI_SERVICE_URL")
 	if url == "" {
-		url = "http://localhost:8001"
+		url = "https://nobetci-ai-service.onrender.com"
 	}
 	return &AIService{
 		BaseURL: url,
@@ -44,6 +44,7 @@ type PipelineResult struct {
 		PrimaryType  string `json:"primary_type"`
 		PrimaryLabel string `json:"primary_label"`
 	} `json:"severity"`
+	Demo bool `json:"demo"`
 }
 
 type PetitionResult struct {

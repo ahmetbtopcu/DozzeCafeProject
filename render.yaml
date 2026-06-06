@@ -10,6 +10,8 @@ services:
     healthCheckPath: /health
     envVars:
       - key: DEMO_MODE
+        value: "true"
+      - key: ENABLE_SPECIALIST_MODELS
         value: "false"
       - key: OPENAI_API_KEY
         sync: false

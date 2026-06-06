@@ -1,30 +1,31 @@
 # Nöbetçi — 3 Dakikalık Sunum Akışı
 
+## Sunum öncesi (zorunlu)
+```powershell
+.\scripts\warmup-health.ps1
+```
+Render free tier cold start ~30–60 sn. Canlı URL:
+- Backend: `https://nobetci-backend.onrender.com`
+- AI: `https://nobetci-ai-service.onrender.com`
+
 ## 0:00–0:30 Problem
-- Vatandaş ihlal görüyor ama kime, hangi maddeyle şikayet edeceğini bilmiyor
-- CİMER/153'e yazıyor → yanlış kuruma gidiyor → sonuç yok
+Vatandaş ihlal görüyor ama hangi kuruma şikayet edeceğini bilmiyor.
 
-## 0:30–1:30 Canlı Demo (Expo veya Web)
-1. Fotoğraf çek / yükle (Başakşehir demo görüntüsü)
-2. **Anonimleştirme** göster (blur sayısı)
-3. İhlal türü + şiddet skoru
-4. **Yetki yönlendirici:** "İlçe Zabıta" / "Fen İşleri"
-5. Otomatik **dilekçe** ekranda
+## 0:30–1:30 Canlı Demo
+1. Web veya Expo'dan foto yükle
+2. **YuNet blur** (blur sayısı)
+3. İhlal + şiddet (demo cache veya YOLO)
+4. Yetki yönlendirici + dilekçe
 
-## 1:30–2:15 Harita + İstatistik (Web panel)
-- Şiddet renkli pinler
-- Açık istatistik: ihlal türü dağılımı
+## 1:30–2:15 Harita + istatistik
+Web panel — `nobetci-backend.onrender.com` üzerinden
 
 ## 2:15–2:45 Teknik WOW
-- Pipeline: Anonimleştir → CV → RAG → Yetki → Dilekçe
-- Tek LLM çağrısıyla yapılamaz (jüri kriteri)
+Anonimleştir → CV → RAG → Yetki → Dilekçe pipeline
 
-## 2:45–3:00 KVKK + Kapanış
-- Yüz/plaka blur model öncesi
-- `purge-raw-data.ps1` — veri imhası
-- "Nöbetçi — belediyeye hesap soran vatandaş asistanı"
+## 2:45–3:00 KVKK
+YuNet + LPD-YuNet, `purge-raw-data.ps1`
 
-## Yedek Plan
-- `DEMO_MODE=true` → cache'li 5 örnek (`ai-service/demo/cache.json`)
-- AI servis offline → Go backend demo fallback
-- Yedek video: _(etkinlikte kaydedilecek)_
+## Yedek
+- `DEMO_MODE=true` — 5 cache örneği
+- Backend uyuyorsa warmup script tekrar çalıştır

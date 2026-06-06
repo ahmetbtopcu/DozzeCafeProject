@@ -19,10 +19,15 @@ def _load() -> dict:
     return _cache
 
 
-def get_demo_pipeline() -> dict[str, Any]:
+def get_demo_pipeline(
+    image_base64: str = "",
+    blur_count: int = 2,
+) -> dict[str, Any]:
     samples = _load()["samples"]
     sample = random.choice(samples)
     auth = route_authority(sample["violation_type"], sample["lat"], sample["lng"])
+    if sample.get("authority"):
+        auth = {**auth, **sample["authority"]}
     petition = _template_petition(
         sample["violation_type"],
         auth,
@@ -32,13 +37,20 @@ def get_demo_pipeline() -> dict[str, Any]:
         sample["severity"],
     )
     return {
-        "image_base64": "",
-        "blur_count": 2,
+        "image_base64": image_base64 or sample.get("image_base64", ""),
+        "blur_count": blur_count,
         "detections": sample["detections"],
         "severity": sample["severity"],
         "demo_id": sample["id"],
+        "demo": True,
         "petition": petition,
         "authority": auth,
         "violation_type": sample["violation_type"],
         "violation_label": sample["violation_label"],
     }
+
+
+def demo_detections_from_cache() -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Cache'den tespit + şiddet (blur sonrası fallback)."""
+    d = get_demo_pipeline()
+    return d["detections"], d["severity"]

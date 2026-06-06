@@ -3,74 +3,69 @@
 > Cursor Hackathon (6 Haziran 2026) — Sokak ihlallerini fotoğrafla, CV ile sınıflandır,
 > doğru kuruma yönlendir, mevzuat maddesiyle hukuki dilekçe üret.
 
-## Problem
-Türkiye'de kaldırım işgali, çukur, kırık tabela ve çöp en çok şikayet edilen konular.
-Vatandaşlar CİMER/153'e yazıyor ama **hangi kuruma, hangi maddeyle** şikayet edeceğini bilmiyor.
+## Canlı Ortam
 
-## Çözüm
-1. Fotoğraf yükle → yüz/plaka **anonimleştirilir** (KVKK).
-2. CV ihlal türünü tespit eder.
-3. RAG mevzuat maddesini ve **sorumlu kurumu** bulur (yetki yönlendirici).
-4. Resmi dilekçe otomatik üretilir.
-5. Haritada ihlaller ve istatistikler görüntülenir.
+| Servis | URL |
+|--------|-----|
+| Go API | `https://nobetci-backend.onrender.com` |
+| AI servis | `https://nobetci-ai-service.onrender.com` |
+| Web panel | Vercel (deploy sonrası) |
+
+Backend **yalnızca Render'da** çalışır; lokal Go/Python sunucusu gerekmez.
 
 ## Mimari
 
 | Klasör | Teknoloji | Hosting |
 |--------|-----------|---------|
 | `web/` | Next.js + Leaflet | Vercel |
-| `mobile/` | Expo | — |
-| `backend/` | Go (masterfabric-go) | Render |
-| `ai-service/` | Python FastAPI + HF modelleri | Render |
-| `docs/` | KVKK + mevzuat corpus | — |
+| `mobile/` | Expo | Expo Go |
+| `backend/` | Go API | Render |
+| `ai-service/` | FastAPI + YuNet blur + YOLO | Render |
+| `docs/` | KVKK + mevzuat + model araştırması | — |
 
-## Kurulum
+## Deploy
 
+### Render (backend + AI)
 ```bash
-# AI servis
-cd ai-service
-python -m venv .venv
-.venv\Scripts\activate   # Windows
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8001
+# Render Dashboard → Blueprint → render.yaml
+# veya: render blueprint sync
+```
+- `DEMO_MODE=true` (free tier)
+- Cold start ~30–60 sn — sunumdan 2 dk önce `scripts/warmup-health.ps1` çalıştırın
 
-# Backend
-cd backend
-go run ./cmd/api
-
-# Web
-cd web && npm install && npm run dev
-
-# Mobile
-cd mobile && npm install && npx expo start
+### Vercel (web)
+```bash
+cd web
+# Vercel env: NEXT_PUBLIC_API_URL=https://nobetci-backend.onrender.com
+vercel deploy
 ```
 
-### Ortam değişkenleri
-`.env.example` dosyasını `.env` olarak kopyalayın.
+### Expo (mobile)
+```bash
+cd mobile
+# .env: EXPO_PUBLIC_API_URL=https://nobetci-backend.onrender.com
+npx expo start
+```
 
-## AI Araçları (jüri dökümantasyonu)
+## Ortam değişkenleri
+`.env.example` dosyasını kopyalayın. Anahtarlar repoya girmez.
 
-### Cursor IDE + Agentic Ruleset
-- `.cursor/rules/` — `00-proje.mdc`, `kvkk.mdc`, `git-commit.mdc`, `stack.mdc`, `proje-spec.mdc`
-- **Plan-then-execute:** Önce mimari plan (Composer), sonra faz faz agent implementasyonu
-- **Prompt teknikleri:** Bağlam dosyası ekleme (plan.md), stack kısıtlarını rules ile gömme, incremental commit talimatı
+## AI Stack (özet)
 
-### Cursor CLI / SDK
-- Geliştirme Cursor Agent modunda; commit disiplini `git-commit.mdc` ile otomatik hatırlatma
-- `scripts/purge-raw-data.ps1` — KVKK ham veri imhası (PowerShell)
+| Katman | Model |
+|--------|-------|
+| Blur (KVKK) | OpenCV YuNet + LPD-YuNet (MIT) |
+| Tespit (demo) | `demo/cache.json` — 5 örnek |
+| Tespit (canlı) | YOLO-World-S @320, conf 0.35 |
+| RAG | Keyword fallback (free tier) |
+| Dilekçe | Şablon (+ opsiyonel LLM) |
 
-### Modeller (Hugging Face)
-| Model | Kullanım |
-|-------|----------|
-| YOLO-World (`yolov8s-world.pt`) | Sıfır-atış ihlal tespiti |
-| RDD2022 / yol hasarı weights | Çukur tespiti (yedek) |
-| `ytu-ce-cosmos/turkish-e5-large` | Mevzuat RAG embedding |
-| OpenCV Haar cascade | KVKK yüz blur (model öncesi) |
+Detay: [`docs/model-arastirma.md`](docs/model-arastirma.md)
 
-### KVKK
-- `ai-service/app/anonymize.py` — blur pipeline model öncesi çalışır
-- Ham görüntü `data/raw/` — `.gitignore` korumalı
-- `docs/KVKK-veri-imha-belgesi.md` + `scripts/purge-raw-data.ps1`
+## KVKK
+- YuNet + LPD-YuNet blur model öncesi
+- `scripts/purge-raw-data.ps1` — ham veri imhası
+- `docs/KVKK-veri-imha-belgesi.md`
 
 ## Takım
 - Ahmet Bayram Topcu + Memo
