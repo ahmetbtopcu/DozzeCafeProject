@@ -1,0 +1,59 @@
+{
+  "samples": [
+    {
+      "id": "demo-001",
+      "violation_type": "sidewalk_occupation",
+      "violation_label": "Kaldırım işgali",
+      "lat": 41.0935,
+      "lng": 28.8018,
+      "severity": { "score": 78, "level": "critical", "primary_type": "sidewalk_occupation", "primary_label": "Kaldırım işgali" },
+      "detections": [{ "type": "sidewalk_occupation", "label": "Kaldırım işgali", "confidence": 0.89, "bbox": [0.2, 0.5, 0.8, 0.9] }],
+      "authority": { "authority": "İlçe Belediyesi Zabıta Müdürlüğü", "channel": "CİMER / 153", "law_ref": "5326 md. 32, 38" },
+      "petition_snippet": "Kaldırıma park edilmiş araç nedeniyle yayaların yürüyüş hakkı engellenmektedir."
+    },
+    {
+      "id": "demo-002",
+      "violation_type": "road_damage",
+      "violation_label": "Çukur / bozuk yol",
+      "lat": 41.0928,
+      "lng": 28.8025,
+      "severity": { "score": 65, "level": "high", "primary_type": "road_damage", "primary_label": "Çukur / bozuk yol" },
+      "detections": [{ "type": "road_damage", "label": "Çukur / bozuk yol", "confidence": 0.82, "bbox": [0.3, 0.6, 0.7, 0.85] }],
+      "authority": { "authority": "İlçe Belediyesi Fen İşleri", "channel": "CİMER / 153", "law_ref": "5216 görev dağılımı" },
+      "petition_snippet": "Yol yüzeyinde derin çukur bulunmaktadır; trafik güvenliği risk altındadır."
+    },
+    {
+      "id": "demo-003",
+      "violation_type": "garbage_pile",
+      "violation_label": "Çöp / moloz yığını",
+      "lat": 41.0940,
+      "lng": 28.8030,
+      "severity": { "score": 55, "level": "high", "primary_type": "garbage_pile", "primary_label": "Çöp / moloz yığını" },
+      "detections": [{ "type": "garbage_pile", "label": "Çöp / moloz yığını", "confidence": 0.76, "bbox": [0.15, 0.55, 0.6, 0.9] }],
+      "authority": { "authority": "İlçe Belediyesi Temizlik İşleri", "channel": "CİMER / 153", "law_ref": "5393 md. 14" },
+      "petition_snippet": "Sokakta moloz yığını bulunmaktadır; çevre kirliliği ve sağlık riski oluşturmaktadır."
+    },
+    {
+      "id": "demo-004",
+      "violation_type": "broken_sign",
+      "violation_label": "Kırık / devrik tabela",
+      "lat": 41.0925,
+      "lng": 28.8010,
+      "severity": { "score": 48, "level": "medium", "primary_type": "broken_sign", "primary_label": "Kırık / devrik tabela" },
+      "detections": [{ "type": "broken_sign", "label": "Kırık / devrik tabela", "confidence": 0.71, "bbox": [0.4, 0.2, 0.65, 0.5] }],
+      "authority": { "authority": "İBB Ulaşım Dairesi / KGM", "channel": "CİMER / Alo 159", "law_ref": "2918 Karayolları Trafik Kanunu" },
+      "petition_snippet": "Trafik yön tabelası devrilmiş durumda; sürücülerin yön bulması engellenmektedir."
+    },
+    {
+      "id": "demo-005",
+      "violation_type": "sidewalk_occupation",
+      "violation_label": "Kaldırım işgali (masa)",
+      "lat": 41.0938,
+      "lng": 28.8040,
+      "severity": { "score": 42, "level": "medium", "primary_type": "sidewalk_occupation", "primary_label": "Kaldırım işgali" },
+      "detections": [{ "type": "sidewalk_occupation", "label": "Kaldırım işgali", "confidence": 0.68, "bbox": [0.25, 0.45, 0.75, 0.8] }],
+      "authority": { "authority": "İlçe Belediyesi Zabıta Müdürlüğü", "channel": "CİMER / 153", "law_ref": "5326 md. 38; TS 9111" },
+      "petition_snippet": "Kaldırımda işletme masası bulunmaktadır; engelli erişimi engellenmektedir."
+    }
+  ]
+}

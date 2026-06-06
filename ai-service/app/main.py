@@ -8,7 +8,7 @@ from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app import anonymize, detect, petition, rag, severity
+from app import anonymize, demo, detect, petition, rag, severity
 from app.authority import route_authority
 from app.config import DEMO_MODE
 
@@ -75,9 +75,24 @@ class PipelineResponse(BaseModel):
     severity: dict[str, Any]
 
 
+@app.get("/demo/samples")
+async def demo_samples() -> dict[str, Any]:
+    from app.demo import _load
+
+    return _load()
+
+
 @app.post("/pipeline", response_model=PipelineResponse)
 async def pipeline_endpoint(file: UploadFile = File(...)) -> PipelineResponse:
     """Anonimleştir → tespit → şiddet (tek çağrı)."""
+    if DEMO_MODE:
+        d = demo.get_demo_pipeline()
+        return PipelineResponse(
+            image_base64=d.get("image_base64", ""),
+            blur_count=d["blur_count"],
+            detections=d["detections"],
+            severity=d["severity"],
+        )
     data = await file.read()
     anon, blur_count = anonymize.anonymize_image_bytes(data)
     dets = detect.detect_violations(anon)

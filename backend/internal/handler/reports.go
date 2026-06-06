@@ -138,21 +138,32 @@ func (h *ReportHandler) processReport(image []byte, lat, lng float64) (*models.R
 
 func demoReport(lat, lng float64) *models.Report {
 	return &models.Report{
-		ID:            uuid.New().String(),
-		CreatedAt:     time.Now().UTC(),
-		Lat:           lat,
-		Lng:           lng,
-		BlurCount:     2,
-		ViolationType: "sidewalk_occupation",
+		ID:             uuid.New().String(),
+		CreatedAt:      time.Now().UTC(),
+		Lat:            lat,
+		Lng:            lng,
+		BlurCount:      2,
+		ViolationType:  "sidewalk_occupation",
 		ViolationLabel: "Kaldırım işgali",
-		Severity:      models.Severity{Score: 72, Level: "critical", PrimaryType: "sidewalk_occupation"},
+		Severity:       models.Severity{Score: 72, Level: "critical", PrimaryType: "sidewalk_occupation"},
+		Detections: []models.Detection{
+			{Type: "sidewalk_occupation", Label: "Kaldırım işgali", Confidence: 0.89, BBox: []float64{0.2, 0.5, 0.8, 0.9}},
+		},
 		Authority: models.Authority{
 			Authority: "İlçe Belediyesi Zabıta Müdürlüğü",
 			Channel:   "CİMER / 153",
 			LawRef:    "5326 md. 32, 38",
 		},
-		Petition: "Demo modu — örnek dilekçe metni.",
-		Demo:     true,
+		Petition: `T.C. CİMER BAŞVURUSU — Demo modu
+
+KONU: Kaldırım işgali
+
+SAYIN YETKİLİ, Başakşehir'de tespit edilen kaldırım işgali hakkında şikayetimi arz ederim.
+YETKİLİ KURUM: İlçe Belediyesi Zabıta Müdürlüğü
+HUKUKİ DAYANAK: 5326 sayılı Kabahatler Kanunu md. 32, 38
+
+Saygılarımla, Vatandaş`,
+		Demo: true,
 	}
 }
 
