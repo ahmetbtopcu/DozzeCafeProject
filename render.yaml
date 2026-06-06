@@ -1,0 +1,35 @@
+# Nöbetçi — Render Blueprint (Go API + AI servis)
+services:
+  - type: web
+    name: nobetci-ai-service
+    runtime: docker
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./ai-service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: DEMO_MODE
+        value: "false"
+      - key: OPENAI_API_KEY
+        sync: false
+
+  - type: web
+    name: nobetci-backend
+    runtime: go
+    region: frankfurt
+    plan: free
+    rootDir: backend
+    buildCommand: go build -o bin/api ./cmd/api
+    startCommand: ./bin/api
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        sync: false
+      - key: AI_SERVICE_URL
+        fromService:
+          name: nobetci-ai-service
+          type: web
+          property: hostport
+      - key: DEMO_MODE
+        value: "true"
