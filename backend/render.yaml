@@ -1,0 +1,14 @@
+# Render.com Blueprint — backend (placeholder).
+# masterfabric-go geldiğinde build/start komutlarını mimariye göre güncelle.
+services:
+  - type: web
+    name: gungoren-backend
+    runtime: go
+    region: frankfurt
+    plan: free
+    buildCommand: go build -o bin/api ./cmd/api
+    startCommand: ./bin/api
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        sync: false
