@@ -16,23 +16,24 @@ type Props = {
 export default function StatsPanel({ stats }: Props) {
   if (!stats) {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-white p-4 text-sm text-zinc-500">
+      <div className="text-sm text-zinc-500">
         İstatistik yükleniyor…
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-4 text-lg font-semibold text-zinc-900">Açık İstatistik</h2>
-      <div className="mb-4 grid grid-cols-2 gap-3">
-        <div className="rounded-lg bg-emerald-50 p-3">
-          <p className="text-2xl font-bold text-emerald-700">{stats.total_reports}</p>
+    <section>
+      <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-700">Açık istatistik</p>
+      <h2 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950">Saha özeti</h2>
+      <div className="my-7 grid grid-cols-2 gap-6 border-y border-emerald-100 py-6">
+        <div>
+          <p className="text-3xl font-semibold text-emerald-700">{stats.total_reports}</p>
           <p className="text-xs text-emerald-600">Toplam ihbar</p>
         </div>
-        <div className="rounded-lg bg-blue-50 p-3">
-          <p className="text-2xl font-bold text-blue-700">{stats.avg_severity.toFixed(0)}</p>
-          <p className="text-xs text-blue-600">Ort. şiddet</p>
+        <div>
+          <p className="text-3xl font-semibold text-emerald-700">{stats.avg_severity.toFixed(0)}</p>
+          <p className="text-xs text-emerald-600">Ort. şiddet</p>
         </div>
       </div>
 
@@ -58,6 +59,6 @@ export default function StatsPanel({ stats }: Props) {
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }

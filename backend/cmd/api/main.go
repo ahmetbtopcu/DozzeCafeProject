@@ -10,6 +10,7 @@ import (
 
 	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/client"
 	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/handler"
+	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/seed"
 	"github.com/ahmetbtopcu/gungoren-proje/backend/internal/store"
 )
 
@@ -23,8 +24,8 @@ type healthResponse struct {
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Admin-Key")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
@@ -37,6 +38,16 @@ func main() {
 	ai := client.NewAIService()
 	st := store.NewMemoryStore()
 	reports := handler.NewReportHandler(ai, st)
+	admin := handler.NewAdminHandler(st)
+
+	if len(st.List()) == 0 {
+		if mockReport, err := seed.BuildMockReport(); err != nil {
+			log.Printf("Mock ihbar yüklenemedi: %v", err)
+		} else {
+			st.Add(mockReport)
+			log.Printf("Mock ihbar eklendi (id=%s) — admin paneli önizlemesi", mockReport.ID)
+		}
+	}
 
 	mux := http.NewServeMux()
 
@@ -64,6 +75,11 @@ func main() {
 
 	mux.HandleFunc("/api/reports/map", reports.Map)
 	mux.HandleFunc("/api/reports/stats", reports.Stats)
+
+	mux.HandleFunc("GET /api/admin/reports", admin.List)
+	mux.HandleFunc("GET /api/admin/reports/{id}", admin.Get)
+	mux.HandleFunc("PATCH /api/admin/reports/{id}", admin.UpdateStatus)
+	mux.HandleFunc("POST /api/admin/seed-mock", admin.SeedMock)
 
 	port := os.Getenv("PORT")
 	if port == "" {

@@ -10,12 +10,6 @@ dist/
 build/
 *.tsbuildinfo
 
-# Expo
-.expo/
-.expo-shared/
-mobile/.expo/
-web-build/
-
 # Go
 backend/bin/
 backend/tmp/

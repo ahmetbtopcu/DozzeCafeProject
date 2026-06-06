@@ -18,7 +18,6 @@ Backend **yalnızca Render'da** çalışır; lokal Go/Python sunucusu gerekmez.
 | Klasör | Teknoloji | Hosting |
 |--------|-----------|---------|
 | `web/` | Next.js + Leaflet | Vercel |
-| `mobile/` | Expo | Expo Go |
 | `backend/` | Go API | Render |
 | `ai-service/` | FastAPI + YuNet blur + YOLO | Render |
 | `docs/` | KVKK + mevzuat + model araştırması | — |
@@ -40,15 +39,14 @@ cd web
 vercel deploy
 ```
 
-### Expo (mobile)
-```bash
-cd mobile
-# .env: EXPO_PUBLIC_API_URL=https://nobetci-backend.onrender.com
-npx expo start
-```
-
 ## Ortam değişkenleri
 `.env.example` dosyasını kopyalayın. Anahtarlar repoya girmez.
+
+## Lokasyon Verisi
+İl/ilçe/mahalle dropdown'ları lokal JSON'dan değil, resmi açık veri kaynağından
+beslenir. Varsayılan kaynak İBB Açık Veri Portalı **Muhtarlık Adres Bilgileri**
+GeoJSON dosyasıdır. Türkiye geneli TUCBS/WFS servis adresi hazırlandığında
+`LOCATION_OPEN_DATA_URL` ile aynı formatta dönen dönüştürücü endpoint'e geçilebilir.
 
 ## AI Stack (özet)
 

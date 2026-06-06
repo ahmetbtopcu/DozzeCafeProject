@@ -31,21 +31,67 @@ type LegalRef struct {
 	Score   float64 `json:"score"`
 }
 
+const (
+	ReportStatusPending   = "pending"
+	ReportStatusInReview  = "in_review"
+	ReportStatusForwarded = "forwarded"
+	ReportStatusClosed    = "closed"
+)
+
+type Address struct {
+	City         string `json:"city,omitempty"`
+	District     string `json:"district,omitempty"`
+	Neighborhood string `json:"neighborhood,omitempty"`
+	Avenue       string `json:"avenue,omitempty"`
+	Street       string `json:"street,omitempty"`
+	BuildingNo   string `json:"building_no,omitempty"`
+}
+
+type Reporter struct {
+	FirstName string `json:"first_name,omitempty"`
+	LastName  string `json:"last_name,omitempty"`
+	Name      string `json:"name,omitempty"`
+	Email     string `json:"email,omitempty"`
+	Phone     string `json:"phone,omitempty"`
+}
+
 type Report struct {
-	ID              string      `json:"id"`
-	CreatedAt       time.Time   `json:"created_at"`
-	Lat             float64     `json:"lat"`
-	Lng             float64     `json:"lng"`
-	ImageBase64     string      `json:"image_base64,omitempty"`
-	BlurCount       int         `json:"blur_count"`
-	Detections      []Detection `json:"detections"`
-	Severity        Severity    `json:"severity"`
-	ViolationType   string      `json:"violation_type"`
-	ViolationLabel  string      `json:"violation_label"`
-	Authority       Authority   `json:"authority"`
-	LegalReferences []LegalRef  `json:"legal_references"`
-	Petition        string      `json:"petition"`
-	Demo            bool        `json:"demo,omitempty"`
+	ID                string      `json:"id"`
+	CreatedAt         time.Time   `json:"created_at"`
+	Status            string      `json:"status"`
+	AdminNote         string      `json:"admin_note,omitempty"`
+	Lat               float64     `json:"lat"`
+	Lng               float64     `json:"lng"`
+	ImageBase64       string      `json:"image_base64,omitempty"`
+	BlurCount         int         `json:"blur_count"`
+	Detections        []Detection `json:"detections"`
+	Severity          Severity    `json:"severity"`
+	ViolationType     string      `json:"violation_type"`
+	ViolationLabel    string      `json:"violation_label"`
+	UserViolationType string      `json:"user_violation_type,omitempty"`
+	Details           string      `json:"details,omitempty"`
+	Address           Address     `json:"address,omitempty"`
+	Reporter          Reporter    `json:"reporter,omitempty"`
+	Authority         Authority   `json:"authority"`
+	LegalReferences   []LegalRef  `json:"legal_references"`
+	Petition          string      `json:"petition"`
+	Demo              bool        `json:"demo,omitempty"`
+}
+
+type ReportSummary struct {
+	ID                string    `json:"id"`
+	CreatedAt         time.Time `json:"created_at"`
+	Status            string    `json:"status"`
+	Lat               float64   `json:"lat"`
+	Lng               float64   `json:"lng"`
+	ViolationType     string    `json:"violation_type"`
+	ViolationLabel    string    `json:"violation_label"`
+	UserViolationType string    `json:"user_violation_type,omitempty"`
+	Details           string    `json:"details,omitempty"`
+	Address           Address   `json:"address,omitempty"`
+	Reporter          Reporter  `json:"reporter,omitempty"`
+	Severity          Severity  `json:"severity"`
+	Demo              bool      `json:"demo,omitempty"`
 }
 
 type MapPin struct {

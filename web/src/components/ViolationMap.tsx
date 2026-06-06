@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
+import { useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { MapPin } from "@/lib/api";
 
@@ -15,16 +17,18 @@ const SEVERITY_COLORS: Record<string, string> = {
 type Props = {
   pins: MapPin[];
   center?: [number, number];
+  zoom?: number;
 };
 
-export default function ViolationMap({ pins, center = [41.0931, 28.8022] }: Props) {
+export default function ViolationMap({ pins, center = [41.0931, 28.8022], zoom = 14 }: Props) {
   return (
     <MapContainer
       center={center}
-      zoom={14}
+      zoom={zoom}
       className="h-full w-full rounded-xl z-0"
       scrollWheelZoom
     >
+      <MapRecenter center={center} zoom={zoom} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -49,4 +53,14 @@ export default function ViolationMap({ pins, center = [41.0931, 28.8022] }: Prop
       ))}
     </MapContainer>
   );
+}
+
+function MapRecenter({ center, zoom }: { center: [number, number]; zoom: number }) {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView(center, zoom, { animate: true });
+  }, [center, map, zoom]);
+
+  return null;
 }

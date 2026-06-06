@@ -6,7 +6,7 @@ alwaysApply: true
 # Nöbetçi — Otomatik Belediye Hesap Sorma Motoru
 
 ## Akış
-1. Vatandaş ihlal fotoğrafı yükler (Expo/web).
+1. Vatandaş ihlal fotoğrafı web panelden yükler.
 2. **Anonimleştirme** (yüz/plaka blur) — model öncesi, KVKK zorunlu.
 3. **CV tespit** → ihlal türü + bbox + güven.
 4. **Şiddet skoru** (bbox/derinlik).
@@ -16,7 +16,6 @@ alwaysApply: true
 
 ## Monorepo
 - `web/` — Next.js panel (Vercel)
-- `mobile/` — Expo (foto + ihbar)
 - `backend/` — Go API, masterfabric-go uyumlu (Render)
 - `ai-service/` — Python FastAPI (CV + RAG + dilekçe, Render)
 - `docs/mevzuat/` — RAG corpus (commit edilir, ham görüntü değil)
@@ -37,7 +36,7 @@ alwaysApply: true
 ## Canlı ortam (lokal backend yok)
 - Go API: `https://nobetci-backend.onrender.com`
 - AI: `https://nobetci-ai-service.onrender.com`
-- Web/mobile yalnızca canlı URL kullanır; `localhost` fallback yok.
+- Web yalnızca canlı URL kullanır; `localhost` fallback yok.
 
 ## Blur (KVKK)
 YuNet + LPD-YuNet (`ai-service/app/anonymize.py`) — model öncesi zorunlu.

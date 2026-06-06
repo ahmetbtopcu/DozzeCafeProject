@@ -12,13 +12,13 @@ Google Street View görüntüleri + sayısal veriler.
 
 ## Monorepo yapısı
 - `web/`     → Next.js (TypeScript, App Router) — Vercel'e deploy
-- `mobile/`  → Expo (TypeScript) — cross-platform
 - `backend/` → Go (Golang) — Render.com'a deploy. **Mimari masterfabric-go yapısına
   birebir uyar.** (Resmî mimari etkinlik başında teslim edilir; bu yapıyı bozma.)
+- `ai-service/` → FastAPI + CV/RAG servisleri — Render.com'a deploy
 - `docs/`    → KVKK belgeleri + teknik kriter çizelgesi
 
 ## Değişmez kısıtlar (kural ihlali = puan kaybı / diskalifiye)
-1. Stack dışına çıkma: Next.js / Expo / Go / Hugging Face / Google Street View API.
+1. Stack dışına çıkma: Next.js / Go / FastAPI / Hugging Face / Google Street View API.
 2. Backend'de masterfabric-go mimarisini değiştirme; sadece feature ekle.
 3. KVKK kurallarına uy (bkz. `kvkk.mdc`) — ihlal doğrudan diskalifiye.
 4. Her anlamlı değişiklikten sonra commit at (bkz. `git-commit.mdc`).

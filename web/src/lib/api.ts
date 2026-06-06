@@ -62,12 +62,40 @@ export async function fetchStats(): Promise<Stats> {
 export async function submitReport(
   file: File,
   lat: number,
-  lng: number
+  lng: number,
+  meta?: {
+    violationType?: string;
+    city?: string;
+    district?: string;
+    neighborhood?: string;
+    avenue?: string;
+    street?: string;
+    buildingNo?: string;
+    details?: string;
+    reporterFirstName?: string;
+    reporterLastName?: string;
+    reporterName?: string;
+    reporterEmail?: string;
+    reporterPhone?: string;
+  }
 ): Promise<Report> {
   const form = new FormData();
   form.append("image", file);
   form.append("lat", String(lat));
   form.append("lng", String(lng));
+  if (meta?.violationType) form.append("violation_type", meta.violationType);
+  if (meta?.city) form.append("city", meta.city);
+  if (meta?.district) form.append("district", meta.district);
+  if (meta?.neighborhood) form.append("neighborhood", meta.neighborhood);
+  if (meta?.avenue) form.append("avenue", meta.avenue);
+  if (meta?.street) form.append("street", meta.street);
+  if (meta?.buildingNo) form.append("building_no", meta.buildingNo);
+  if (meta?.details) form.append("details", meta.details);
+  if (meta?.reporterFirstName) form.append("reporter_first_name", meta.reporterFirstName);
+  if (meta?.reporterLastName) form.append("reporter_last_name", meta.reporterLastName);
+  if (meta?.reporterName) form.append("reporter_name", meta.reporterName);
+  if (meta?.reporterEmail) form.append("reporter_email", meta.reporterEmail);
+  if (meta?.reporterPhone) form.append("reporter_phone", meta.reporterPhone);
 
   const res = await fetch(`${API_URL}/api/reports`, {
     method: "POST",
