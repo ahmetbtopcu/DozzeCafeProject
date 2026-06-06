@@ -1,0 +1,31 @@
+{
+  "description": "Başakşehir demo koridoru — ham görüntüler data/raw/ altında (gitignore). Bu manifest commit edilir.",
+  "corridor": "Basaksehir Merkez",
+  "center": { "lat": 41.0931, "lng": 28.8022 },
+  "samples": [
+    {
+      "id": "demo-001",
+      "file": "data/raw/demo-001.jpg",
+      "lat": 41.0935,
+      "lng": 28.8018,
+      "expected_violation": "sidewalk_occupation",
+      "note": "Kaldırıma park edilmiş araç"
+    },
+    {
+      "id": "demo-002",
+      "file": "data/raw/demo-002.jpg",
+      "lat": 41.0928,
+      "lng": 28.8025,
+      "expected_violation": "road_damage",
+      "note": "Yol çukuru"
+    },
+    {
+      "id": "demo-003",
+      "file": "data/raw/demo-003.jpg",
+      "lat": 41.0940,
+      "lng": 28.8030,
+      "expected_violation": "garbage_pile",
+      "note": "Moloz yığını"
+    }
+  ]
+}
