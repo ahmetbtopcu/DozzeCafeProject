@@ -1,35 +1,34 @@
 # KVKK Veri İmha ve Anonimleştirme Belgesi
 
-> Bu belge ödül hakedişi için **zorunlu**dur. Hackathon sonunda ham görsellerin
-> silindiğini ve anonimleştirme yapıldığını yazılı olarak belgeler.
-> Etkinlik sonunda ilgili alanlar doldurulup imzalanacaktır.
+> Nöbetçi — Otomatik Belediye Hesap Sorma Motoru
+> Hackathon sonunda ham görsellerin silindiğini ve anonimleştirme yapıldığını belgeler.
 
 ## 1. Takım Bilgileri
-- **Takım adı:** _______________
-- **Üyeler:** _______________ , _______________
+- **Takım adı:** Nöbetçi (Dozze Coffee Başakşehir)
+- **Üyeler:** Ahmet Bayram Topcu, Memo
 - **Tarih:** 6 Haziran 2026
 
 ## 2. İşlenen Verinin Kapsamı
-- **Veri kaynağı:** Google Street View API / sağlanan veri seti
-- **Amaç:** Yalnızca cansız kentsel obje tespiti (tabela, çöp kutusu, hasarlı yol vb.)
+- **Veri kaynağı:** Vatandaş ihbar fotoğrafları, Google Street View / Mapillary (demo)
+- **Amaç:** Cansız kentsel ihlal tespiti (kaldırım işgali, çukur, tabela, çöp)
 - **İşlenmeyen veriler:** Yüz tanıma, plaka okuma, kişi/araç takibi, profilleme YAPILMAMIŞTIR.
 
 ## 3. Anonimleştirme
-- [ ] İnsan yüzleri model çalışmadan önce geri döndürülemez şekilde bulanıklaştırıldı.
-- [ ] Araç plakaları geri döndürülemez şekilde bulanıklaştırıldı.
-- **Kullanılan yöntem:** _______________ (ör. Gaussian blur + downsample)
-- **Anonimleştirme kodu:** `___________` (repo içi dosya yolu)
+- [x] İnsan yüzleri model çalışmadan önce geri döndürülemez şekilde bulanıklaştırıldı.
+- [x] Araç plakaları geri döndürülemez şekilde bulanıklaştırıldı.
+- **Kullanılan yöntem:** OpenCV Haar cascade (yüz) + alt bant plaka heuristic + Gaussian blur
+- **Anonimleştirme kodu:** `ai-service/app/anonymize.py`
 
 ## 4. Veri Güvenliği
-- [ ] Ham veriler açık repoya / şifrelenmemiş buluta yüklenmedi.
-- [ ] API anahtarları yalnızca `.env` içinde tutuldu, commit edilmedi.
-- **Depolama konumu:** _______________ (lokal / geçici)
+- [x] Ham veriler açık repoya / şifrelenmemiş buluta yüklenmedi.
+- [x] API anahtarları yalnızca `.env` içinde tutuldu, commit edilmedi.
+- **Depolama konumu:** Lokal `data/raw/` (`.gitignore` korumalı)
 
 ## 5. İmha (Hackathon Sonu)
 - [ ] Tüm ham görüntüler kalıcı olarak silindi.
-- **Silme tarihi/saati:** _______________
-- **Silme yöntemi:** _______________ (ör. `Remove-Item -Recurse -Force data/raw`)
-- **Doğrulama:** _______________ (klasörün boş olduğunun ekran görüntüsü/çıktısı)
+- **Silme komutu:** `.\scripts\purge-raw-data.ps1`
+- **Silme tarihi/saati:** _(etkinlik sonunda doldurulacak)_
+- **Doğrulama:** `data/raw/` yalnızca `.gitkeep` içerir
 
 ## 6. Beyan
 Yukarıdaki bilgilerin doğru olduğunu ve KVKK kurallarına uyulduğunu beyan ederiz.

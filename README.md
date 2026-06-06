@@ -51,17 +51,24 @@ cd mobile && npm install && npx expo start
 ## AI Araçları (jüri dökümantasyonu)
 
 ### Cursor IDE + Agentic Ruleset
-- `.cursor/rules/` — proje, KVKK, commit, stack, `proje-spec.mdc`
-- Plan-then-execute: önce mimari plan, sonra faz faz implementasyon
+- `.cursor/rules/` — `00-proje.mdc`, `kvkk.mdc`, `git-commit.mdc`, `stack.mdc`, `proje-spec.mdc`
+- **Plan-then-execute:** Önce mimari plan (Composer), sonra faz faz agent implementasyonu
+- **Prompt teknikleri:** Bağlam dosyası ekleme (plan.md), stack kısıtlarını rules ile gömme, incremental commit talimatı
+
+### Cursor CLI / SDK
+- Geliştirme Cursor Agent modunda; commit disiplini `git-commit.mdc` ile otomatik hatırlatma
+- `scripts/purge-raw-data.ps1` — KVKK ham veri imhası (PowerShell)
 
 ### Modeller (Hugging Face)
-- YOLO-World — açık sözlük ihlal tespiti
-- RDD2022 weights — yol hasarı
-- turkish-e5-large — mevzuat RAG embedding
-- Depth Anything V2 (opsiyonel) — şiddet ölçümü
+| Model | Kullanım |
+|-------|----------|
+| YOLO-World (`yolov8s-world.pt`) | Sıfır-atış ihlal tespiti |
+| RDD2022 / yol hasarı weights | Çukur tespiti (yedek) |
+| `ytu-ce-cosmos/turkish-e5-large` | Mevzuat RAG embedding |
+| OpenCV Haar cascade | KVKK yüz blur (model öncesi) |
 
 ### KVKK
-- Anonimleştirme pipeline model öncesi
+- `ai-service/app/anonymize.py` — blur pipeline model öncesi çalışır
 - Ham görüntü `data/raw/` — `.gitignore` korumalı
 - `docs/KVKK-veri-imha-belgesi.md` + `scripts/purge-raw-data.ps1`
 
